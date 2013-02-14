@@ -14,7 +14,7 @@ ApplicationWindow {
             Label { text: "Repo:" }
             TextField {
                 id: repo
-                text: "/home/frederik/dev/tools/git/qmlgit"
+                text: "/home/frederik/dev/projects/qmlgit"
                 onTextChanged: {
                     Git.repo = repo.text
                 }

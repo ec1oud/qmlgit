@@ -14,3 +14,4 @@ include(src/src.pri)
 RESOURCES += \
     resources.qrc
 
+INCLUDEPATH += /home/frederik/dev/tools/libgit2/libgit2/include

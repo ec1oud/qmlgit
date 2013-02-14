@@ -1,79 +1,26 @@
 #include "gitdiff.h"
 
-
-
 #include <git2.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <QObject>
-#include <QDebug>
 #include <QString>
+#include <QDir>
 
-static void check(int error, const char *message)
-{
-  if (error) {
-    fprintf(stderr, "%s (%d)\n", message, error);
-    exit(1);
-  }
-}
-
-static int resolve_to_tree(
-  git_repository *repo, const char *identifier, git_tree **tree)
-{
-  int err = 0;
-  size_t len = strlen(identifier);
-  git_oid oid;
-  git_object *obj = NULL;
-
-  /* try to resolve as OID */
-  if (git_oid_fromstrn(&oid, identifier, len) == 0)
-    git_object_lookup_prefix(&obj, repo, &oid, len, GIT_OBJ_ANY);
-
-  /* try to resolve as reference */
-  if (obj == NULL) {
-    git_reference *ref, *resolved;
-    if (git_reference_lookup(&ref, repo, identifier) == 0) {
-      git_reference_resolve(&resolved, ref);
-      git_reference_free(ref);
-      if (resolved) {
-        git_object_lookup(&obj, repo, git_reference_target(resolved), GIT_OBJ_ANY);
-        git_reference_free(resolved);
-      }
-    }
-  }
-
-  if (obj == NULL)
-    return GIT_ENOTFOUND;
-
-  switch (git_object_type(obj)) {
-  case GIT_OBJ_TREE:
-    *tree = (git_tree *)obj;
-    break;
-  case GIT_OBJ_COMMIT:
-    err = git_commit_tree(tree, (git_commit *)obj);
-    git_object_free(obj);
-    break;
-  default:
-    err = GIT_ENOTFOUND;
-  }
-
-  return err;
-}
+#include <QDebug>
 
 static int printer(
-  const git_diff_delta *delta,
-  const git_diff_range *range,
-  char usage,
+  const git_diff_delta */*delta*/,
+  const git_diff_range */*range*/,
+  char /*usage*/,
   const char *line,
-  size_t line_len,
+  size_t /*line_len*/,
   void *data)
 {
   QString *strDiff = static_cast<QString*>(data);
-  int color = 0;
 
-//  if (*last_color >= 0) {
 //    switch (usage) {
 //    case GIT_DIFF_LINE_ADDITION: color = 3; break;
 //    case GIT_DIFF_LINE_DELETION: color = 2; break;
@@ -83,160 +30,75 @@ static int printer(
 //    case GIT_DIFF_LINE_HUNK_HDR: color = 4; break;
 //    default: color = 0;
 //    }
-//    if (color != *last_color) {
-//      if (*last_color == 1 || color == 1)
-//        fputs(colors[0], stdout);
-//      fputs(colors[color], stdout);
-//      *last_color = color;
-//    }
-//  }
 
   strDiff->append(line);
   return 0;
 }
 
-static int check_uint16_param(const char *arg, const char *pattern, uint16_t *val)
-{
-  size_t len = strlen(pattern);
-  uint16_t strval;
-  char *endptr = NULL;
-  if (strncmp(arg, pattern, len))
-    return 0;
-  strval = strtoul(arg + len, &endptr, 0);
-  if (endptr == arg)
-    return 0;
-  *val = strval;
-  return 1;
-}
-
-static int check_str_param(const char *arg, const char *pattern, const char **val)
-{
-  size_t len = strlen(pattern);
-  if (strncmp(arg, pattern, len))
-    return 0;
-  *val = (const char *)(arg + len);
-  return 1;
-}
-
-
-GitDiff::GitDiff()
+GitStuff::GitStuff()
+    : m_repo(0), m_diffDirty(true)
 {}
 
-void GitDiff::setRepo(const QString &repo)
+GitStuff::~GitStuff()
 {
-    m_repo = repo;
-    refresh();
-    emit repoChanged(repo);
+    git_repository_free(m_repo);
 }
 
-void GitDiff::refresh()
+void GitStuff::setRepo(const QString &repo)
 {
-    git_repository *repo = NULL;
-    git_tree *t1 = NULL, *t2 = NULL;
+    git_repository_free(m_repo);
+    m_repo = 0;
+
+    if (QDir::isAbsolutePath(repo)) {
+        qDebug() << "Loading repository...";
+
+        // this probably needs unicode fixing on non-linux FIXME
+        int open = git_repository_open_ext(&m_repo, repo.toUtf8().data(), 0, NULL);
+        if (open == 0) {
+            m_repoUrl = repo;
+            m_diffDirty = true;
+
+            emit repoChanged(m_repoUrl);
+            emit diffChanged();
+            return;
+        }
+    }
+    m_diffDirty = false;
+    m_diff = QStringLiteral("Could not open repository.");
+    m_repoUrl = QString();
+    emit repoChanged(m_repoUrl);
+}
+
+QString GitStuff::diff() const
+{
+    if (m_diffDirty) {
+        qDebug() << "Getting diff...";
+        m_diff = workingDirDiff();
+        m_diffDirty = false;
+    }
+    return m_diff;
+}
+
+QString GitStuff::workingDirDiff() const
+{
+    if (!m_repo)
+        return QString();
+
     git_diff_options opts = GIT_DIFF_OPTIONS_INIT;
+
     git_diff_list *diff;
-    int cached = 0;
 
-    char *treeish1 = NULL;
-    char *treeish2 = NULL;
-
-
-//        for (i = 1; i < argc; ++i) {
-//            a = argv[i];
-
-//            if (a[0] != '-') {
-//                if (treeish1 == NULL)
-//                    treeish1 = a;
-//                else if (treeish2 == NULL)
-//                    treeish2 = a;
-//                else
-//                    usage("Only one or two tree identifiers can be provided", NULL);
-//            }
-//            else if (!strcmp(a, "-p") || !strcmp(a, "-u") ||
-//                     !strcmp(a, "--patch"))
-//                compact = 0;
-//            else if (!strcmp(a, "--cached"))
-//                cached = 1;
-//            else if (!strcmp(a, "--name-status"))
-//                compact = 1;
-//            else if (!strcmp(a, "--color"))
-//                color = 0;
-//            else if (!strcmp(a, "--no-color"))
-//                color = -1;
-//            else if (!strcmp(a, "-R"))
-//                opts.flags |= GIT_DIFF_REVERSE;
-//            else if (!strcmp(a, "-a") || !strcmp(a, "--text"))
-//                opts.flags |= GIT_DIFF_FORCE_TEXT;
-//            else if (!strcmp(a, "--ignore-space-at-eol"))
-//                opts.flags |= GIT_DIFF_IGNORE_WHITESPACE_EOL;
-//            else if (!strcmp(a, "-b") || !strcmp(a, "--ignore-space-change"))
-//                opts.flags |= GIT_DIFF_IGNORE_WHITESPACE_CHANGE;
-//            else if (!strcmp(a, "-w") || !strcmp(a, "--ignore-all-space"))
-//                opts.flags |= GIT_DIFF_IGNORE_WHITESPACE;
-//            else if (!strcmp(a, "--ignored"))
-//                opts.flags |= GIT_DIFF_INCLUDE_IGNORED;
-//            else if (!strcmp(a, "--untracked"))
-//                opts.flags |= GIT_DIFF_INCLUDE_UNTRACKED;
-//            else if (!check_uint16_param(a, "-U", &opts.context_lines) &&
-//                     !check_uint16_param(a, "--unified=", &opts.context_lines) &&
-//                     !check_uint16_param(a, "--inter-hunk-context=",
-//                                         &opts.interhunk_lines) &&
-//                     !check_str_param(a, "--src-prefix=", &opts.old_prefix) &&
-//                     !check_str_param(a, "--dst-prefix=", &opts.new_prefix))
-//                usage("Unknown arg", a);
-//        }
-
-    /* open repo */
-
-    // this probably needs unicode fixing on non-linux FIXME
-    int open = git_repository_open_ext(&repo, m_repo.toUtf8().data(), 0, NULL);
-    if (open != 0) {
-        m_diff = QStringLiteral("Could not open repository");
-        return;
-    }
-
-    if (treeish1)
-        check(resolve_to_tree(repo, treeish1, &t1), "Looking up first tree");
-    if (treeish2)
-        check(resolve_to_tree(repo, treeish2, &t2), "Looking up second tree");
-
-    /* <sha1> <sha2> */
-    /* <sha1> --cached */
-    /* <sha1> */
-    /* --cached */
-    /* nothing */
-
-    if (t1 && t2)
-        check(git_diff_tree_to_tree(&diff, repo, t1, t2, &opts), "Diff");
-    else if (t1 && cached)
-        check(git_diff_tree_to_index(&diff, repo, t1, NULL, &opts), "Diff");
-    else if (t1) {
-        git_diff_list *diff2;
-        check(git_diff_tree_to_index(&diff, repo, t1, NULL, &opts), "Diff");
-        check(git_diff_index_to_workdir(&diff2, repo, NULL, &opts), "Diff");
-        check(git_diff_merge(diff, diff2), "Merge diffs");
-        git_diff_list_free(diff2);
-    }
-    else if (cached) {
-        check(resolve_to_tree(repo, "HEAD", &t1), "looking up HEAD");
-        check(git_diff_tree_to_index(&diff, repo, t1, NULL, &opts), "Diff");
-    }
-    else
-        check(git_diff_index_to_workdir(&diff, repo, NULL, &opts), "Diff");
-
-//    if (color >= 0)
-//        fputs(colors[0], stdout);
-
+    int ret = git_diff_index_to_workdir(&diff, m_repo, NULL, &opts);
+    if (ret != 0)
+        return QString("Error: Diff failed (%1)").arg(ret);
 
     QString strDiff;
-    check(git_diff_print_patch(diff, printer, &strDiff), "Displaying diff");
-
-    m_diff = strDiff;
+    ret = git_diff_print_patch(diff, printer, &strDiff);
+    if (ret != 0)
+        return QString("Error: Formatting diff failed (%1)").arg(ret);
 
     git_diff_list_free(diff);
-    git_tree_free(t1);
-    git_tree_free(t2);
-    git_repository_free(repo);
 
+    return strDiff;
 }
 

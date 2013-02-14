@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QQmlEngine engine;
 
-    GitDiff diff;
+    GitStuff diff;
     engine.rootContext()->setContextProperty(QStringLiteral("Git"), &diff);
 
     QQmlComponent component(&engine);
