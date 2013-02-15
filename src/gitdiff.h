@@ -8,12 +8,15 @@
 
 #include <git2.h>
 
+#include "gitcommitlist.h"
+
 class GitStuff : public QObject
 {
     Q_OBJECT
 
     Q_PROPERTY(QString repo READ repo WRITE setRepo NOTIFY repoChanged)
     Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
+
 
 public:
     GitStuff();

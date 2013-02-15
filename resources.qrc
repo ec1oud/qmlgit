@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/main.qml</file>
+        <file>qml/diff.qml</file>
+        <file>qml/log.qml</file>
     </qresource>
 </RCC>

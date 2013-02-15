@@ -99,6 +99,10 @@ QString GitStuff::workingDirDiff() const
 
     git_diff_list_free(diff);
 
+    if (strDiff.isEmpty())
+        strDiff = QStringLiteral("No changes in repository.");
+
+
     return strDiff;
 }
 

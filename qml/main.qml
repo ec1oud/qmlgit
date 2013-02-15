@@ -20,12 +20,24 @@ ApplicationWindow {
                 }
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
-
+            Button {
+                text: "Diff"
+                onClicked: {
+                    contents.source = "qrc:/qml/diff.qml"
+                }
+            }
+            Button {
+                text: "Log"
+                onClicked: {
+                    contents.source = "qrc:/qml/log.qml"
+                }
+            }
         }
     }
 
-    TextArea {
+    Loader {
         anchors.fill: parent
-        text: Git.diff
+        anchors.margins: 4
+        id: contents
     }
 }

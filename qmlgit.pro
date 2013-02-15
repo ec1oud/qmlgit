@@ -15,3 +15,7 @@ RESOURCES += \
     resources.qrc
 
 INCLUDEPATH += /home/frederik/dev/tools/libgit2/libgit2/include
+
+OTHER_FILES += qml/* \
+    qml/diff.qml \
+    qml/log.qml
