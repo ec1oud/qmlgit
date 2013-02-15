@@ -1,0 +1,3 @@
+
+#include "diffhighlighter.h"
+

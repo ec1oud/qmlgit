@@ -44,10 +44,14 @@
 
 #include "gitdiff.h"
 
+#include "diffhighlighter.h"
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QQmlEngine engine;
+
+    qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
 
     GitStuff diff;
     engine.rootContext()->setContextProperty(QStringLiteral("Git"), &diff);
