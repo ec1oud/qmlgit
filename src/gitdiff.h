@@ -4,30 +4,25 @@
 #ifndef GITDIFF_H
 #define GITDIFF_H
 
+
 #include <QObject>
 
 #include <git2.h>
 
-#include "gitcommitlist.h"
-
-class GitStuff : public QObject
+class GitDiff : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString repo READ repo WRITE setRepo NOTIFY repoChanged)
     Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
 
-
 public:
-    GitStuff();
-    ~GitStuff();
+    GitDiff();
+    ~GitDiff();
 
     QString diff() const;
-    QString repo() { return m_repoUrl; }
-    void setRepo(const QString &repo);
+    void setRepo(git_repository * repo);
 
 Q_SIGNALS:
-    void repoChanged(QString);
     void diffChanged();
 
 private:
@@ -41,4 +36,3 @@ private:
 };
 
 #endif
-

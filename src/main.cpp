@@ -42,6 +42,8 @@
 #include <QtQml>
 #include <QtQuick/QQuickView>
 
+#include "gitrepo.h"
+#include "gitcommitlist.h"
 #include "gitdiff.h"
 
 #include "diffhighlighter.h"
@@ -53,8 +55,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
 
-    GitStuff diff;
-    engine.rootContext()->setContextProperty(QStringLiteral("Git"), &diff);
+    qmlRegisterType<GitRepo>("GitRepo", 1, 0, "GitRepo");
+    qmlRegisterType<GitDiff>("GitDiff", 1, 0, "GitRepo");
 
     QQmlComponent component(&engine);
     component.loadUrl(QUrl("qrc:/qml/main.qml"));

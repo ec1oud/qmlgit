@@ -2,9 +2,15 @@ import QtQuick 2.0
 
 import QtDesktop 1.0
 
+import GitRepo 1.0
+
+
+
 ApplicationWindow {
     width: 600
     height: 400
+
+    id: root
 
     toolBar: ToolBar {
         width: parent.width
@@ -13,11 +19,9 @@ ApplicationWindow {
             anchors.margins: 4
             Label { text: "Repo:" }
             TextField {
-                id: repo
+                id: repoUrl
                 text: "/home/frederik/dev/tools/git/qmlgit"
-                onTextChanged: {
-                    Git.repo = repo.text
-                }
+
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
             Button {
@@ -33,6 +37,11 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+    GitRepo {
+        id: gitRepo
+        repo: repoUrl.text
     }
 
     Loader {

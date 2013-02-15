@@ -9,7 +9,9 @@
 
 class GitCommitList : public QStandardItemModel
 {
-
+public:
+    GitCommitList()
+    {}
 };
 
 #endif

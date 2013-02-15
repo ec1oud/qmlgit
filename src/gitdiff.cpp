@@ -35,41 +35,30 @@ static int printer(
   return 0;
 }
 
-GitStuff::GitStuff()
-    : m_repo(0), m_diffDirty(true)
+GitDiff::GitDiff()
+    : m_diffDirty(true), m_repo(0)
 {}
 
-GitStuff::~GitStuff()
+GitDiff::~GitDiff()
 {
-    git_repository_free(m_repo);
 }
 
-void GitStuff::setRepo(const QString &repo)
+void GitDiff::setRepo(git_repository *repo)
 {
-    git_repository_free(m_repo);
-    m_repo = 0;
+    m_repo = repo;
 
-    if (QDir::isAbsolutePath(repo)) {
+    if (m_repo) {
         qDebug() << "Loading repository...";
 
-        // this probably needs unicode fixing on non-linux FIXME
-        int open = git_repository_open_ext(&m_repo, repo.toUtf8().data(), 0, NULL);
-        if (open == 0) {
-            m_repoUrl = repo;
-            m_diffDirty = true;
-
-            emit repoChanged(m_repoUrl);
-            emit diffChanged();
-            return;
-        }
+        m_diffDirty = true;
+    } else {
+        m_diff = QStringLiteral("Could not open repository.");
+        m_diffDirty = false;
     }
-    m_diffDirty = false;
-    m_diff = QStringLiteral("Could not open repository.");
-    m_repoUrl = QString();
-    emit repoChanged(m_repoUrl);
+    emit diffChanged();
 }
 
-QString GitStuff::diff() const
+QString GitDiff::diff() const
 {
     if (m_diffDirty) {
         qDebug() << "Getting diff...";
@@ -79,7 +68,7 @@ QString GitStuff::diff() const
     return m_diff;
 }
 
-QString GitStuff::workingDirDiff() const
+QString GitDiff::workingDirDiff() const
 {
     if (!m_repo)
         return QString();

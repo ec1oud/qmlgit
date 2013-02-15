@@ -6,9 +6,11 @@ SOURCES += \
     $$PWD/diffhighlighter.cpp \
     $$PWD/gitcommitlist.cpp \
     $$PWD/gitdiff.cpp \
+    $$PWD/gitrepo.cpp \
     $$PWD/main.cpp \
 
 HEADERS += \
     $$PWD/diffhighlighter.h \
+    $$PWD/gitrepo.h \
     $$PWD/gitcommitlist.h \
     $$PWD/gitdiff.h \
