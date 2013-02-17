@@ -9,10 +9,13 @@
 
 #include <git2.h>
 
+#include "gitrepo.h"
+
 class GitDiff : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString repoUrl READ repoUrl WRITE setRepoUrl NOTIFY urlChanged)
     Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
 
 public:
@@ -20,9 +23,11 @@ public:
     ~GitDiff();
 
     QString diff() const;
-    void setRepo(git_repository * repo);
+    void setRepoUrl(const QString &repoUrl);
+    QString repoUrl() const;
 
 Q_SIGNALS:
+    void urlChanged();
     void diffChanged();
 
 private:
@@ -32,7 +37,7 @@ private:
     mutable QString m_diff;
     mutable bool m_diffDirty;
 
-    git_repository *m_repo;
+    GitRepo m_repo;
 };
 
 #endif

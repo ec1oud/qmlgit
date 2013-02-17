@@ -10,6 +10,7 @@
 #include <QDir>
 
 #include <QDebug>
+#include <QQuickItem>
 
 static int printer(
   const git_diff_delta */*delta*/,
@@ -36,25 +37,26 @@ static int printer(
 }
 
 GitDiff::GitDiff()
-    : m_diffDirty(true), m_repo(0)
-{}
+    : m_diffDirty(true)
+{
+}
 
 GitDiff::~GitDiff()
 {
 }
 
-void GitDiff::setRepo(git_repository *repo)
+void GitDiff::setRepoUrl(const QString &url)
 {
-    m_repo = repo;
+    m_repo.open(url);
 
-    if (m_repo) {
+    if (m_repo.isValid()) {
         qDebug() << "Loading repository...";
-
         m_diffDirty = true;
     } else {
         m_diff = QStringLiteral("Could not open repository.");
         m_diffDirty = false;
     }
+    emit urlChanged();
     emit diffChanged();
 }
 
@@ -68,16 +70,21 @@ QString GitDiff::diff() const
     return m_diff;
 }
 
+QString GitDiff::repoUrl() const
+{
+    return m_repo.url();
+}
+
 QString GitDiff::workingDirDiff() const
 {
-    if (!m_repo)
+    if (!m_repo.isValid())
         return QString();
 
     git_diff_options opts = GIT_DIFF_OPTIONS_INIT;
 
     git_diff_list *diff;
 
-    int ret = git_diff_index_to_workdir(&diff, m_repo, NULL, &opts);
+    int ret = git_diff_index_to_workdir(&diff, m_repo.git_repo(), NULL, &opts);
     if (ret != 0)
         return QString("Error: Diff failed (%1)").arg(ret);
 
@@ -95,3 +102,4 @@ QString GitDiff::workingDirDiff() const
     return strDiff;
 }
 
+QML_DECLARE_TYPE(GitDiff)
