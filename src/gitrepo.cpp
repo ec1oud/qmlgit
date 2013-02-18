@@ -154,6 +154,17 @@ QStringList Git::branches() const
     return b;
 }
 
+QString Git::currentBranch() const
+{
+    return m_branch;
+}
+
+void Git::setCurrentBranch(const QString &branch)
+{
+    m_branch = branch;
+    emit branchesChanged();
+}
+
 QAbstractItemModel *Git::logModel()
 {
     if (!m_log)

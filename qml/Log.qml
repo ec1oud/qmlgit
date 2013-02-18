@@ -2,14 +2,17 @@ import QtQuick 2.0
 
 import Git 1.0
 
-Rectangle {
+Item {
+    property alias repoUrl: gitLog.repoUrl
+    property alias branch: gitLog.currentBranch
+
     SystemPalette {
         id: pal
     }
 
     Git {
         id: gitLog
-        repoUrl: root.repoUrl
+        repoUrl: log.repoUrl
     }
 
     ListView {
