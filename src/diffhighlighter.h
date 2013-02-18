@@ -48,7 +48,6 @@ public:
 
     void setTarget(QQuickItem *target)
     {
-        qDebug() << "set target " << m_target;
         m_target = target;
         emit targetChanged();
 
@@ -57,8 +56,6 @@ public:
             QQuickTextDocument *qqDoc = doc.value<QQuickTextDocument*>();
 
             if (qqDoc) {
-                qDebug() << "got text doc: ";
-
                 if (m_highlighter)
                     delete m_highlighter;
                 m_highlighter = new Highlighter(qqDoc->textDocument());

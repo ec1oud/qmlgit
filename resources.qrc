@@ -5,5 +5,7 @@
         <file>qml/Log.qml</file>
         <file>qml/log2.qml</file>
         <file>qml/status.qml</file>
+        <file>qml/LogView.qml</file>
+        <file>qml/DiffView.qml</file>
     </qresource>
 </RCC>

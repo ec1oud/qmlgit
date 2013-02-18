@@ -17,6 +17,7 @@ class Git : public QObject
     Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
     Q_PROPERTY(QStringList branches READ branches NOTIFY branchesChanged)
     Q_PROPERTY(QString currentBranch READ currentBranch WRITE setCurrentBranch NOTIFY currentBranchChanged)
+    Q_PROPERTY(QString currentCommit READ currentCommit WRITE setCurrentCommit NOTIFY currentCommitChanged)
     Q_PROPERTY(QAbstractItemModel *logModel READ logModel NOTIFY modelChanged)
 
 public:
@@ -34,6 +35,9 @@ public:
     QString currentBranch() const;
     void setCurrentBranch(const QString &branch);
 
+    QString currentCommit() const;
+    void setCurrentCommit(const QString &commit);
+
     QAbstractItemModel *logModel();
 
 Q_SIGNALS:
@@ -42,13 +46,16 @@ Q_SIGNALS:
     void modelChanged();
     void branchesChanged();
     void currentBranchChanged();
+    void currentCommitChanged();
 
 private:
-    QString workingDirDiff() const;
+    QString getDiff() const;
+    void clearLog();
 
     git_repository *m_repo;
     QString m_url;
     QString m_branch;
+    QString m_commit;
 
     mutable QString m_diff;
     mutable bool m_diffDirty;

@@ -85,16 +85,18 @@ void GitCommitList::setRepo(git_repository *repo)
     beginResetModel();
     if (repo) {
         m_repo = repo;
-        loadRepository();
+        loadBranch();
     }
     endResetModel();
 }
 
 void GitCommitList::setBranch(const QString &branch)
 {
+    beginResetModel();
     m_branch = branch;
     loadBranch();
     emit branchChanged();
+    endResetModel();
 }
 
 QString GitCommitList::branch() const
@@ -173,22 +175,19 @@ QVariant GitCommitList::data(const QModelIndex &index, int role) const
     return ret;
 }
 
-void GitCommitList::loadRepository()
-{
-    loadBranch();
-}
-
 void GitCommitList::loadBranch()
 {
     if (!m_repo)
         return;
 
+    foreach (git_commit *commit, m_commits)
+        git_commit_free(commit);
+    m_commits.clear();
+
     if (m_branch.isEmpty()) {
         qDebug() << "Warning, no branch specified.";
-        m_branch = QStringLiteral("HEAD");
+        return;
     }
-
-    qDebug() << "Looking up HEAD";
 
     git_reference *ref;
     int error = git_reference_lookup(&ref, m_repo, m_branch.toUtf8().constData());
@@ -197,29 +196,17 @@ void GitCommitList::loadBranch()
         return;
     }
 
-    git_reference *resolvedRef;
-    git_reference_resolve(&resolvedRef, ref);
+    git_oid oid;
+    error = git_reference_name_to_id(&oid, m_repo, m_branch.toUtf8().constData());
+    Q_ASSERT(!error);
     git_reference_free(ref);
-    const git_oid *target = git_reference_target(resolvedRef);
-    git_reference_free(resolvedRef);
 
     git_revwalk *walk;
     git_commit *wcommit;
 
     git_revwalk_new(&walk, m_repo);
-//    git_revwalk_sorting(walk, GIT_SORT_TOPOLOGICAL | GIT_SORT_REVERSE);
-
-    git_oid oid;
-    git_oid_cpy(&oid, target);
-
-    // FIXME: pushing our oid doesn't work :(
-
-//    git_revwalk_push(walk, &oid);
-    git_revwalk_push_head(walk);
-
-    foreach (git_commit *commit, m_commits)
-        git_commit_free(commit);
-    m_commits.clear();
+    error = git_revwalk_push(walk, &oid);
+    Q_ASSERT(error == 0);
 
     while ((git_revwalk_next(&oid, walk)) == 0) {
         error = git_commit_lookup(&wcommit, m_repo, &oid);
@@ -231,4 +218,3 @@ void GitCommitList::loadBranch()
 
     git_revwalk_free(walk);
 }
-

@@ -1,78 +1,55 @@
 import QtQuick 2.0
-
+import QtDesktop 1.0
 import Git 1.0
 
 Item {
-    property alias repoUrl: gitLog.repoUrl
-    property alias branch: gitLog.currentBranch
-
-    SystemPalette {
-        id: pal
-    }
+    anchors.fill: parent
 
     Git {
-        id: gitLog
-        repoUrl: log.repoUrl
+        id: git
+        repoUrl: root.repoUrl
     }
 
-    ListView {
-        id: list
-        height: parent.height
-        width: parent.width/4*3
-        clip: true
-        focus: true
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 4
+        RowLayout {
+            width: parent.width
+            height: 40
+            spacing: 4
 
-        model: gitLog.logModel
-        delegate: commitDelegate
-
-        Keys.onDownPressed: incrementCurrentIndex()
-        Keys.onUpPressed: decrementCurrentIndex()
-
-        Component.onCompleted: forceActiveFocus()
-    }
-
-    Text {
-        anchors.right: parent.right
-        text: "Total: " + list.count
-    }
-
-    Component {
-        id: commitDelegate
-
-        Item {
-            x: 4
-            width: parent.width - 8
-            height: messageText.height + 16
-
-            Behavior on height { NumberAnimation { duration: 200 } }
-
-            property bool details: ListView.isCurrentItem
-
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: 4
-                radius: 3
-                color: details ? pal.highlight : pal.base
-                Text {
-                    id: messageText
-                    x: 4
-                    width: parent.width - 8
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    y: 4
-                    text: details ? message.concat("\n ", author, " <", authorEmail, ">\n", time)
-                                  : shortMessage + "\n  " + author
-                    color: details ? pal.highlightedText : pal.text
-                }
+            Label {
+                text: "Branch:"
             }
+            ComboBox {
+                id: comboBox
+                model: git.branches
+                width: 150
+            }
+            Item {
+                Layout.horizontalSizePolicy: Layout.Expanding
+            }
+        }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    list.currentIndex = index
-                    forceActiveFocus()
-                }
+        Row {
+            width: parent.width
+            Layout.verticalSizePolicy: Layout.Expanding
+            LogView {
+                id: logView
+                width: details ? parent.width/3 : parent.width
+                height: parent.height
+
+                repoUrl: git.repoUrl
+                branch: comboBox.selectedText
+                Behavior on width { NumberAnimation { duration: 100} }
+            }
+            DiffView {
+                visible: logView.details
+                width: parent.width/3*2
+                height: parent.height
+                commit: logView.currentCommit
             }
         }
     }
-
 }
+

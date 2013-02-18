@@ -41,7 +41,6 @@ Q_SIGNALS:
     void branchChanged();
 
 private:
-    void loadRepository();
     void loadBranch();
 
     git_repository *m_repo;

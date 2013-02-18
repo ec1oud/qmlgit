@@ -30,7 +30,8 @@ ApplicationWindow {
             Label { text: "Repo:" }
             TextField {
                 id: urlField
-                text: "/home/frederik/dev/tools/git/qmlgit"
+//                text: "/home/frederik/dev/tools/git/qmlgit"
+                text: "/home/frederik/dev/qt/qt-src-dev/qtbase"
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
         }
@@ -40,6 +41,8 @@ ApplicationWindow {
         id: tabs
         anchors.fill: parent
         width: parent.width
+
+        current: 1
         Tab {
             title: "Status"
             Loader {
@@ -51,7 +54,7 @@ ApplicationWindow {
             title: "Log"
             Loader {
                 anchors.fill: parent
-                source: visible ? "qrc:/qml/log.qml" : ""
+                source: visible ? "qrc:/qml/Log.qml" : ""
             }
         }
         Tab {
