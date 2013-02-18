@@ -43,8 +43,6 @@
 #include <QtQuick/QQuickView>
 
 #include "gitrepo.h"
-#include "gitcommitlist.h"
-#include "gitdiff.h"
 
 #include "diffhighlighter.h"
 
@@ -53,10 +51,10 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QQmlEngine engine;
 
+    qmlRegisterType<QAbstractItemModel>();
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
 
-    qmlRegisterType<GitDiff>("Git", 1, 0, "GitDiff");
-    qmlRegisterType<GitCommitList>("Git", 1, 0, "GitCommitList");
+    qmlRegisterType<Git>("Git", 1, 0, "Git");
 
     QQmlComponent component(&engine);
     component.loadUrl(QUrl("qrc:/qml/main.qml"));

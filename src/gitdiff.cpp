@@ -41,21 +41,6 @@ GitDiff::GitDiff()
 {
 }
 
-void GitDiff::setRepoUrl(const QString &url)
-{
-    m_repo.open(url);
-
-    if (m_repo.isValid()) {
-        qDebug() << "Loading repository...";
-        m_diffDirty = true;
-    } else {
-        m_diff = QStringLiteral("Could not open repository.");
-        m_diffDirty = false;
-    }
-    emit urlChanged();
-    emit diffChanged();
-}
-
 QString GitDiff::diff() const
 {
     if (m_diffDirty) {
@@ -73,7 +58,7 @@ QString GitDiff::repoUrl() const
 
 QString GitDiff::workingDirDiff() const
 {
-    if (!m_repo.isValid())
+    if (!m_repo.isValidRepository())
         return QString();
 
     git_diff_options opts = GIT_DIFF_OPTIONS_INIT;

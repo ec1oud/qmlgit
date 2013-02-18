@@ -10,12 +10,16 @@ ApplicationWindow {
     property alias repoUrl: urlField.text
 
     Action {
-        shortcut: "1"
-        onTriggered: contents.source = "qrc:/qml/diff.qml"
+        shortcut: "ctrl+1"
+        onTriggered: tabs.current = 0
     }
     Action {
-        shortcut: "2"
-        onTriggered: contents.source = "qrc:/qml/log.qml"
+        shortcut: "ctrl+2"
+        onTriggered: tabs.current = 1
+    }
+    Action {
+        shortcut: "ctrl+3"
+        onTriggered: tabs.current = 2
     }
 
     toolBar: ToolBar {
@@ -26,28 +30,42 @@ ApplicationWindow {
             Label { text: "Repo:" }
             TextField {
                 id: urlField
-                text: "/home/frederik/dev/qt-src-dev/qtbase"
+                text: "/home/frederik/dev/tools/git/qmlgit"
                 Layout.horizontalSizePolicy: Layout.Expanding
-            }
-            Button {
-                text: "Diff"
-                onClicked: {
-                    contents.source = "qrc:/qml/diff.qml"
-                }
-            }
-            Button {
-                text: "Log"
-                onClicked: {
-                    contents.source = "qrc:/qml/log.qml"
-                }
             }
         }
     }
 
-    Loader {
-        id: contents
+    TabFrame {
+        id: tabs
         anchors.fill: parent
-        anchors.margins: 4
-        source: "qrc:/qml/log.qml"
+        width: parent.width
+        Tab {
+            title: "Status"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/status.qml" : ""
+            }
+        }
+        Tab {
+            title: "Log"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/log.qml" : ""
+            }
+        }
+        Tab {
+            title: "Diff"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/diff.qml" : ""
+            }
+        }
+    }
+
+    statusBar: StatusBar {
+        Label {
+            text: "Loading..."
+        }
     }
 }

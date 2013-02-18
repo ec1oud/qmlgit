@@ -3,5 +3,7 @@
         <file>qml/main.qml</file>
         <file>qml/diff.qml</file>
         <file>qml/log.qml</file>
+        <file>qml/log2.qml</file>
+        <file>qml/status.qml</file>
     </qresource>
 </RCC>

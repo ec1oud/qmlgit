@@ -1,6 +1,7 @@
 
 #include "gitcommitlist.h"
 
+#include <QDateTime>
 #include <QDebug>
 
 //// ### Revwalking
@@ -52,8 +53,9 @@
 
 
 
-GitCommitList::GitCommitList()
+GitCommitList::GitCommitList(git_repository *repo)
 {
+    setRepo(repo);
 }
 
 GitCommitList::~GitCommitList()
@@ -78,18 +80,14 @@ QHash<int, QByteArray> GitCommitList::roleNames() const
     return roles;
 }
 
-void GitCommitList::setRepoUrl(const QString &repoUrl)
+void GitCommitList::setRepo(git_repository *repo)
 {
     beginResetModel();
-    m_repo.open(repoUrl);
-    if (m_repo.isValid())
+    if (repo) {
+        m_repo = repo;
         loadRepository();
+    }
     endResetModel();
-}
-
-QString GitCommitList::repoUrl() const
-{
-    return m_repo.url();
 }
 
 void GitCommitList::setBranch(const QString &branch)
@@ -108,7 +106,7 @@ int GitCommitList::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    if (!m_repo.isValid())
+    if (!m_repo)
         return 0;
 
     return m_commits.count();
@@ -157,9 +155,10 @@ QVariant GitCommitList::data(const QModelIndex &index, int role) const
         ret = git_commit_parentcount(commit);
         break;
     case Time: {
-        git_time_t time = git_commit_time(commit);
-        // ###
-        ret = QVariant((qint64)time);
+        QDateTime time;
+        git_time_t timeT = git_commit_time(commit);
+        time.setTime_t(timeT);
+        ret = QVariant(time);
         break;
     }
     case Oid: {
@@ -181,6 +180,9 @@ void GitCommitList::loadRepository()
 
 void GitCommitList::loadBranch()
 {
+    if (!m_repo)
+        return;
+
     if (m_branch.isEmpty()) {
         qDebug() << "Warning, no branch specified.";
         m_branch = QStringLiteral("HEAD");
@@ -189,7 +191,7 @@ void GitCommitList::loadBranch()
     qDebug() << "Looking up HEAD";
 
     git_reference *ref;
-    int error = git_reference_lookup(&ref, m_repo.git_repo(), m_branch.toUtf8().constData());
+    int error = git_reference_lookup(&ref, m_repo, m_branch.toUtf8().constData());
     if (error != 0) {
         qWarning() << "Looking up reference failed: " + m_branch;
         return;
@@ -204,7 +206,7 @@ void GitCommitList::loadBranch()
     git_revwalk *walk;
     git_commit *wcommit;
 
-    git_revwalk_new(&walk, m_repo.git_repo());
+    git_revwalk_new(&walk, m_repo);
 //    git_revwalk_sorting(walk, GIT_SORT_TOPOLOGICAL | GIT_SORT_REVERSE);
 
     git_oid oid;
@@ -220,7 +222,7 @@ void GitCommitList::loadBranch()
     m_commits.clear();
 
     while ((git_revwalk_next(&oid, walk)) == 0) {
-        error = git_commit_lookup(&wcommit, m_repo.git_repo(), &oid);
+        error = git_commit_lookup(&wcommit, m_repo, &oid);
         if (!error)
             m_commits.append(wcommit);
         else

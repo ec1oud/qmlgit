@@ -4,15 +4,11 @@
 #define GITCOMMITLIST_H
 
 #include <git2.h>
-
-#include "gitrepo.h"
-
 #include <QAbstractListModel>
 
 class GitCommitList : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString repoUrl READ repoUrl WRITE setRepoUrl NOTIFY urlChanged)
     Q_PROPERTY(QString branch READ branch WRITE setBranch NOTIFY branchChanged)
 
 public:
@@ -28,7 +24,7 @@ public:
         Time
     };
 
-    GitCommitList();
+    GitCommitList(git_repository *repo);
     ~GitCommitList();
 
     QHash<int, QByteArray> roleNames() const;
@@ -36,20 +32,19 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    void setRepoUrl(const QString &repoUrl);
-    QString repoUrl() const;
+    void setRepo(git_repository *repo);
+
     void setBranch(const QString &branch);
     QString branch() const;
 
 Q_SIGNALS:
-    void urlChanged();
     void branchChanged();
 
 private:
     void loadRepository();
     void loadBranch();
 
-    GitRepo m_repo;
+    git_repository *m_repo;
     QString m_branch;
 
     QVector<git_commit*> m_commits;

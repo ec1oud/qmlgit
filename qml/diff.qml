@@ -6,8 +6,8 @@ import Git 1.0
 
 Rectangle {
 
-    GitDiff {
-        id: diff
+    Git {
+        id: git
         repoUrl: root.repoUrl
         onRepoUrlChanged: console.log(repoUrl)
     }
@@ -15,11 +15,11 @@ Rectangle {
     TextArea {
         id: textArea
         anchors.fill: parent
-        text: diff.diff
+        text: git.diff
+        readOnly: true
     }
 
     DiffHighlighter {
         target: textArea
     }
-
 }

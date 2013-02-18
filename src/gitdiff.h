@@ -35,7 +35,7 @@ private:
     mutable QString m_diff;
     mutable bool m_diffDirty;
 
-    GitRepo m_repo;
+    Git m_repo;
 };
 
 #endif

@@ -6,9 +6,8 @@ Rectangle {
     SystemPalette {
         id: pal
     }
-    color: pal.light
 
-    GitCommitList {
+    Git {
         id: gitLog
         repoUrl: root.repoUrl
     }
@@ -20,9 +19,13 @@ Rectangle {
         clip: true
         focus: true
 
-        model: gitLog
+        model: gitLog.logModel
         delegate: commitDelegate
-        highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+
+        Keys.onDownPressed: incrementCurrentIndex()
+        Keys.onUpPressed: decrementCurrentIndex()
+
+        Component.onCompleted: forceActiveFocus()
     }
 
     Text {
@@ -34,26 +37,37 @@ Rectangle {
         id: commitDelegate
 
         Item {
-            height: 50
             x: 4
             width: parent.width - 8
+            height: messageText.height + 16
+
+            Behavior on height { NumberAnimation { duration: 200 } }
+
+            property bool details: ListView.isCurrentItem
 
             Rectangle {
-                width: parent.width
-                height: 40
+                anchors.fill: parent
+                anchors.margins: 4
                 radius: 3
-                color: pal.midlight
+                color: details ? pal.highlight : pal.base
                 Text {
+                    id: messageText
                     x: 4
                     width: parent.width - 8
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     y: 4
-                    text: shortMessage + "\n  " + author
+                    text: details ? message.concat("\n ", author, " <", authorEmail, ">\n", time)
+                                  : shortMessage + "\n  " + author
+                    color: details ? pal.highlightedText : pal.text
                 }
             }
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {}
+                onClicked: {
+                    list.currentIndex = index
+                    forceActiveFocus()
+                }
             }
         }
     }
