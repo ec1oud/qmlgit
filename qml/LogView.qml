@@ -8,7 +8,14 @@ Item {
     property alias branch: gitLog.currentBranch
     property alias currentItem: list.currentItem
     property bool details: false
-    property string currentCommit: ""
+    property string currentCommit
+
+    property string author
+    property string authorEmail
+    property string date
+    property string committer
+    property string committerEmail
+    property string message
 
     SystemPalette {
         id: pal
@@ -34,37 +41,38 @@ Item {
         Component.onCompleted: forceActiveFocus()
     }
 
-//    Text {
-//        anchors.right: parent.right
-//        text: "Total: " + list.count
-//    }
-
     Component {
         id: commitDelegate
 
         Item {
-            x: 4
             width: parent.width - 8
-            height: messageText.height + 16
-
-            Behavior on height { NumberAnimation { duration: 200 } }
+            height: messageText.height + 8
 
             property bool current: ListView.isCurrentItem
+            onCurrentChanged: {
+                if (current) {
+                    logView.author = author
+                    logView.message = message
+                    logView.authorEmail = authorEmail
+                    logView.date = date
+                    logView.committer = committer
+                    logView.committerEmail = committerEmail
+                    logView.currentCommit = oid
+                }
+            }
 
             Rectangle {
                 anchors.fill: parent
-                anchors.margins: 4
-                radius: 3
-                color: current ? pal.highlight : pal.base
+                color: current ? pal.highlight : (index % 2 ? pal.base : pal.alternateBase)
                 Text {
                     id: messageText
                     x: 4
                     width: parent.width - 8
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+//                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    elide: Text.ElideRight
                     y: 4
-                    text: current & logView.details ? message.concat("\n ", author, " <", authorEmail, ">\n", time, "\n", oid)
-                                  : shortMessage + "\n  " + author
-                    color: current & logView.details ? pal.highlightedText : pal.text
+                    text: shortMessage
+                    color: current ? pal.highlightedText : pal.text
                 }
             }
 
@@ -75,7 +83,7 @@ Item {
                         logView.details = !logView.details
                     } else {
                         list.currentIndex = index
-                        logView.currentCommit = oid
+                        logView.details = true
                     }
                 }
             }

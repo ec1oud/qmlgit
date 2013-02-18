@@ -26,7 +26,10 @@ Item {
                 model: git.branches
                 width: 150
             }
-            Item {
+            Label {
+                id: authorLabel
+                text: (logView.author.length > 0) ? logView.author.concat(" <", logView.authorEmail, ">") : ""
+                horizontalAlignment: Text.AlignRight
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
         }
@@ -43,11 +46,27 @@ Item {
                 branch: comboBox.selectedText
                 Behavior on width { NumberAnimation { duration: 100} }
             }
-            DiffView {
+            SplitterColumn {
                 visible: logView.details
                 width: parent.width/3*2
                 height: parent.height
-                commit: logView.currentCommit
+                ScrollArea {
+                    frame: true
+                    id: commitView
+                    width: parent.width
+                    height: 120
+                    Text {
+                        x: 4
+                        y: 4
+                        width: parent.width - 20
+                        text: logView.message.concat("\n", logView.date)
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    }
+                }
+                DiffView {
+                    width: parent.width
+                    commit: logView.currentCommit
+                }
             }
         }
     }

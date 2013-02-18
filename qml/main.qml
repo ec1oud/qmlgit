@@ -30,8 +30,8 @@ ApplicationWindow {
             Label { text: "Repo:" }
             TextField {
                 id: urlField
-//                text: "/home/frederik/dev/tools/git/qmlgit"
-                text: "/home/frederik/dev/qt/qt-src-dev/qtbase"
+                text: "/home/frederik/dev/tools/git/qmlgit"
+//                text: "/home/frederik/dev/qt-src-dev/qtbase"
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
         }
@@ -67,8 +67,15 @@ ApplicationWindow {
     }
 
     statusBar: StatusBar {
-        Label {
-            text: "Loading..."
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 4
+            Label {
+                text: "Loading..."
+            }
+            Item {
+                Layout.horizontalSizePolicy: Layout.Expanding
+            }
         }
     }
 }

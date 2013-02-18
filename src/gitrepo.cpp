@@ -27,17 +27,6 @@ static int printer(
   void *data)
 {
   QString *strDiff = static_cast<QString*>(data);
-
-//    switch (usage) {
-//    case GIT_DIFF_LINE_ADDITION: color = 3; break;
-//    case GIT_DIFF_LINE_DELETION: color = 2; break;
-//    case GIT_DIFF_LINE_ADD_EOFNL: color = 3; break;
-//    case GIT_DIFF_LINE_DEL_EOFNL: color = 2; break;
-//    case GIT_DIFF_LINE_FILE_HDR: color = 1; break;
-//    case GIT_DIFF_LINE_HUNK_HDR: color = 4; break;
-//    default: color = 0;
-//    }
-
   strDiff->append(line);
   return 0;
 }
@@ -57,6 +46,7 @@ void Git::setRepoUrl(const QString &url)
     m_url = url;
     git_repository_free(m_repo);
     m_repo = 0;
+    m_commit.clear();
 
     if (QDir::isAbsolutePath(url)) {
         // this probably needs unicode fixing on non-linux FIXME
@@ -163,7 +153,6 @@ QString Git::getDiff() const
         if (ret != 0)
             return QString("Error: Diff failed (%1)").arg(ret);
     } else {
-
         git_tree *tree1 = 0;
         git_tree *tree2 = 0;
 
