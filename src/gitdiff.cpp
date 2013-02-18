@@ -41,10 +41,6 @@ GitDiff::GitDiff()
 {
 }
 
-GitDiff::~GitDiff()
-{
-}
-
 void GitDiff::setRepoUrl(const QString &url)
 {
     m_repo.open(url);

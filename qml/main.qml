@@ -9,6 +9,15 @@ ApplicationWindow {
     id: root
     property alias repoUrl: urlField.text
 
+    Action {
+        shortcut: "1"
+        onTriggered: contents.source = "qrc:/qml/diff.qml"
+    }
+    Action {
+        shortcut: "2"
+        onTriggered: contents.source = "qrc:/qml/log.qml"
+    }
+
     toolBar: ToolBar {
         width: parent.width
         RowLayout {
@@ -17,8 +26,7 @@ ApplicationWindow {
             Label { text: "Repo:" }
             TextField {
                 id: urlField
-                text: "/home/frederik/dev/tools/git/qmlgit"
-
+                text: "/home/frederik/dev/qt-src-dev/qtbase"
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
             Button {
@@ -37,8 +45,9 @@ ApplicationWindow {
     }
 
     Loader {
+        id: contents
         anchors.fill: parent
         anchors.margins: 4
-        id: contents
+        source: "qrc:/qml/log.qml"
     }
 }

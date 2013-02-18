@@ -20,7 +20,6 @@ class GitDiff : public QObject
 
 public:
     GitDiff();
-    ~GitDiff();
 
     QString diff() const;
     void setRepoUrl(const QString &repoUrl);
@@ -33,7 +32,6 @@ Q_SIGNALS:
 private:
     QString workingDirDiff() const;
 
-    QString m_repoUrl;
     mutable QString m_diff;
     mutable bool m_diffDirty;
 

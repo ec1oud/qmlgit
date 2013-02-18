@@ -55,7 +55,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
 
-    qmlRegisterType<GitDiff>("GitDiff", 1, 0, "GitDiff");
+    qmlRegisterType<GitDiff>("Git", 1, 0, "GitDiff");
+    qmlRegisterType<GitCommitList>("Git", 1, 0, "GitCommitList");
 
     QQmlComponent component(&engine);
     component.loadUrl(QUrl("qrc:/qml/main.qml"));
