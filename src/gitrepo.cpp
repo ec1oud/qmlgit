@@ -111,6 +111,7 @@ QString Git::currentCommit() const
 {
     return m_commit;
 }
+
 void Git::setCurrentCommit(const QString &commit)
 {
     qDebug() << "Set commit: " << commit;

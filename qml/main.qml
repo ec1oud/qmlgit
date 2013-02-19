@@ -30,8 +30,8 @@ ApplicationWindow {
             Label { text: "Repo:" }
             TextField {
                 id: urlField
-                text: "/home/frederik/dev/tools/git/qmlgit"
-//                text: "/home/frederik/dev/qt-src-dev/qtbase"
+//                text: "/home/frederik/dev/tools/git/qmlgit"
+                text: "/home/frederik/dev/qt-src-dev/qtbase"
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
         }

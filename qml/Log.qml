@@ -47,6 +47,7 @@ Item {
                 Behavior on width { NumberAnimation { duration: 100} }
             }
             SplitterColumn {
+                id: splitter
                 visible: logView.details
                 width: parent.width/3*2
                 height: parent.height
@@ -58,7 +59,7 @@ Item {
                     Text {
                         x: 4
                         y: 4
-                        width: parent.width - 20
+                        width: splitter.width - 40
                         text: logView.message.concat("\n", logView.date)
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
