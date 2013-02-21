@@ -53,8 +53,9 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QAbstractItemModel>();
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
-
     qmlRegisterType<Git>("Git", 1, 0, "Git");
+
+    engine.rootContext()->setContextProperty(QStringLiteral("workingDir"), QDir::currentPath());
 
     QQmlComponent component(&engine);
     component.loadUrl(QUrl("qrc:/qml/main.qml"));

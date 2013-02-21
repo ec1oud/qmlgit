@@ -46,8 +46,9 @@ Item {
                 branch: comboBox.selectedText
                 Behavior on width { NumberAnimation { duration: 100} }
             }
-            SplitterColumn {
+            Splitter {
                 id: splitter
+                orientation: Qt.Vertical
                 visible: logView.details
                 width: parent.width/3*2
                 height: parent.height
@@ -66,6 +67,7 @@ Item {
                 }
                 DiffView {
                     width: parent.width
+                    height: 120
                     commit: logView.currentCommit
                 }
             }

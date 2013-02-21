@@ -31,7 +31,8 @@ ApplicationWindow {
             TextField {
                 id: urlField
 //                text: "/home/frederik/dev/tools/git/qmlgit"
-                text: "/home/frederik/dev/qt-src-dev/qtbase"
+//                text: "/home/frederik/dev/qt-src-dev/qtbase"
+                text: workingDir
                 Layout.horizontalSizePolicy: Layout.Expanding
             }
         }
