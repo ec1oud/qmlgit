@@ -45,6 +45,7 @@
 #include "gitrepo.h"
 
 #include "diffhighlighter.h"
+#include "beziercurve.h"
 
 int main(int argc, char *argv[])
 {
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QAbstractItemModel>();
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
+    qmlRegisterType<BezierCurve>("CustomGeometry", 1, 0, "BezierCurve");
     qmlRegisterType<Git>("Git", 1, 0, "Git");
 
     engine.rootContext()->setContextProperty(QStringLiteral("workingDir"), QDir::currentPath());

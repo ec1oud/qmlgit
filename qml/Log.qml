@@ -46,14 +46,14 @@ Item {
                 branch: comboBox.selectedText
                 Behavior on width { NumberAnimation { duration: 100} }
             }
-            Splitter {
+            SplitView {
                 id: splitter
                 orientation: Qt.Vertical
                 visible: logView.details
                 width: parent.width/3*2
                 height: parent.height
-                ScrollArea {
-                    frame: true
+                ScrollView {
+                    frameVisible: true
                     id: commitView
                     width: parent.width
                     height: 120

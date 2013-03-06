@@ -7,5 +7,8 @@
         <file>qml/status.qml</file>
         <file>qml/LogView.qml</file>
         <file>qml/DiffView.qml</file>
+        <file>qml/branches.qml</file>
+        <file>qml/Box.qml</file>
+        <file>qml/Branch.qml</file>
     </qresource>
 </RCC>

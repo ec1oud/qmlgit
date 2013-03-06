@@ -38,12 +38,12 @@ ApplicationWindow {
         }
     }
 
-    TabFrame {
+    TabView {
         id: tabs
         anchors.fill: parent
         width: parent.width
 
-        current: 1
+        currentIndex: 1
         Tab {
             title: "Status"
             Loader {
@@ -63,6 +63,14 @@ ApplicationWindow {
             Loader {
                 anchors.fill: parent
                 source: visible ? "qrc:/qml/diff.qml" : ""
+            }
+        }
+
+        Tab {
+            title: "Branches"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/branches.qml" : ""
             }
         }
     }
