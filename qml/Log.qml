@@ -25,7 +25,7 @@ Item {
             ComboBox {
                 id: comboBox
                 model: git.branches
-                width: 150
+                implicitWidth: 200
             }
             Label {
                 id: authorLabel
@@ -36,8 +36,10 @@ Item {
         }
 
         Row {
-            width: parent.width
+            height: parent.height - 40
             Layout.verticalSizePolicy: Layout.Expanding
+            Layout.horizontalSizePolicy: Layout.Expanding
+
             LogView {
                 id: logView
                 width: details ? parent.width/3 : parent.width
