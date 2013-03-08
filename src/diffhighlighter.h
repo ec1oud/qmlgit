@@ -18,13 +18,11 @@ public:
 
         QTextCharFormat diffRemoved;
         diffRemoved.setFontWeight(QFont::Bold);
-        diffRemoved.setForeground(Qt::darkMagenta);
-
+        diffRemoved.setForeground(QColor("#D5271E"));
 
         QTextCharFormat diffAdded;
         diffAdded.setFontWeight(QFont::Bold);
         diffAdded.setForeground(Qt::darkGreen);
-
 
         if (text.at(0) == QLatin1Char('-')) {
             setFormat(0, text.length(), diffRemoved);
