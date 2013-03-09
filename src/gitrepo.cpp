@@ -21,6 +21,7 @@ Git::Git()
     : m_gitCache(0), m_workerThread(0), m_repo(0), m_diffDirty(true), m_log(new GitCommitList())
 {
     m_workerThread = new QThread(this);
+    qDebug() << "main thread: " << thread()->currentThreadId();
 }
 
 Git::~Git()
@@ -47,13 +48,16 @@ void Git::setRepoUrl(const QString &url)
             emit modelChanged();
             emit branchesChanged();
             m_gitCache = new GitCache(m_repo);
+            connect(this, &Git::loadBranch, m_gitCache, &GitCache::loadBranch);
+            connect(this, &Git::loadDiff, m_gitCache, &GitCache::loadDiff);
+
             connect(m_gitCache, &GitCache::branchLoaded, this, &Git::branchLoaded);
             connect(m_gitCache, &GitCache::diffLoaded, this, &Git::diffLoaded);
             m_gitCache->moveToThread(m_workerThread);
 
-            connect(m_workerThread, &QThread::started, m_gitCache, &GitCache::doWork);
             connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
             connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
+            m_workerThread->start();
         }
     }
 }
@@ -95,11 +99,8 @@ QString Git::currentBranch() const
 void Git::setCurrentBranch(const QString &branch)
 {
     m_branch = branch;
-    if (!branch.isEmpty()) {
-        m_gitCache->loadBranch(branch);
-        if (!m_workerThread->isRunning())
-            m_workerThread->start();
-    }
+    if (!branch.isEmpty())
+        emit loadBranch(branch);
 }
 
 void Git::branchLoaded(const QString &branch)
@@ -123,11 +124,8 @@ QString Git::currentCommit() const
 void Git::setCurrentCommit(const QString &commit)
 {
     m_commit = commit;
-    if (!m_commit.isEmpty()) {
-        m_gitCache->loadDiff(commit);
-        if (!m_workerThread->isRunning())
-            m_workerThread->start();
-    }
+    if (!m_commit.isEmpty())
+        emit loadDiff(commit);
     emit diffChanged();
 }
 
