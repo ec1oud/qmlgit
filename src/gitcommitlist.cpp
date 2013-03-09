@@ -5,21 +5,6 @@
 #include <QThread>
 #include <QDebug>
 
-
-
-GitCommitList::GitCommitList(git_repository *repo)
-    : m_worker(0)
-{
-    setRepo(repo);
-}
-
-GitCommitList::~GitCommitList()
-{
-    foreach (git_commit *commit, m_commits)
-        git_commit_free(commit);
-    m_commits.clear();
-}
-
 QHash<int, QByteArray> GitCommitList::roleNames() const
 {
     QHash<int, QByteArray> roles;
@@ -35,48 +20,16 @@ QHash<int, QByteArray> GitCommitList::roleNames() const
     return roles;
 }
 
-void GitCommitList::setRepo(git_repository *repo)
-{
-    m_repo = repo;
-    update();
-}
-
-void GitCommitList::setBranch(const QString &branch)
-{
-    m_branch = branch;
-    update();
-}
-
-void GitCommitList::update()
+void GitCommitList::setBranchData(const QVector<git_commit*> &data)
 {
     beginResetModel();
-    clear();
+    m_commits = data;
     endResetModel();
-
-    if (m_repo && !m_branch.isEmpty())
-        loadBranch();
-}
-
-void GitCommitList::branchLoaded()
-{
-    beginResetModel();
-    m_commits = m_worker->commits();
-    delete m_worker;
-    m_worker = 0;
-    endResetModel();
-    emit branchChanged();
-}
-
-QString GitCommitList::branch() const
-{
-    return m_branch;
 }
 
 int GitCommitList::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
-        return 0;
-    if (!m_repo)
         return 0;
 
     return m_commits.count();
@@ -141,63 +94,4 @@ QVariant GitCommitList::data(const QModelIndex &index, int role) const
     }
     }
     return ret;
-}
-
-void GitCommitList::clear()
-{
-    foreach (git_commit *commit, m_commits)
-        git_commit_free(commit);
-    m_commits.clear();
-}
-
-
-void GitCommitList::loadBranch()
-{
-    m_worker = new Worker(m_repo, m_branch);
-
-    QThread *workerThread = new QThread(this);
-
-    connect(workerThread, &QThread::started, m_worker, &Worker::loadBranch);
-    connect(m_worker, &Worker::done, workerThread, &QThread::quit);
-    connect(workerThread, &QThread::finished, this, &GitCommitList::branchLoaded);
-
-    m_worker->moveToThread(workerThread);
-
-    workerThread->start();
-}
-
-void Worker::loadBranch()
-{
-    Q_ASSERT(m_repo);
-    Q_ASSERT(!m_branch.isEmpty());
-
-    git_reference *ref;
-    int error = git_reference_lookup(&ref, m_repo, m_branch.toUtf8().constData());
-    if (error != 0) {
-        qWarning() << "Looking up reference failed: " + m_branch;
-        return;
-    }
-
-    git_oid oid;
-    error = git_reference_name_to_id(&oid, m_repo, m_branch.toUtf8().constData());
-    Q_ASSERT(!error);
-    git_reference_free(ref);
-
-    git_revwalk *walk;
-    git_commit *wcommit;
-
-    git_revwalk_new(&walk, m_repo);
-    error = git_revwalk_push(walk, &oid);
-    Q_ASSERT(error == 0);
-
-    while ((git_revwalk_next(&oid, walk)) == 0) {
-        error = git_commit_lookup(&wcommit, m_repo, &oid);
-        if (!error)
-            m_commits.append(wcommit);
-        else
-            qWarning() << "Error looking up commit!";
-    }
-
-    git_revwalk_free(walk);
-    emit done();
 }

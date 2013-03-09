@@ -1,13 +1,17 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
+import Git 1.0
 
 ApplicationWindow {
     width: 600
     height: 400
 
     id: root
-    property alias repoUrl: urlField.text
+    Git {
+        id: git
+        repoUrl: urlField.text
+    }
 
     Action {
         shortcut: "ctrl+1"

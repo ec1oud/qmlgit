@@ -7,7 +7,7 @@ QML_IMPORT_PATH =
 # CONFIG += mobility
 # MOBILITY +=
 
-QT += quick widgets
+QT += quick widgets testlib
 
 include(src/src.pri)
 

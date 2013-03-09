@@ -40,7 +40,11 @@ public:
 
     QAbstractItemModel *logModel();
 
-Q_SIGNALS:
+public slots:
+    void branchLoaded(const QString &branch);
+    void diffLoaded(const QString &commit);
+
+signals:
     void repoUrlChanged();
     void diffChanged();
     void modelChanged();
@@ -52,6 +56,8 @@ private:
     QString getDiff() const;
     void clearLog();
 
+    GitCache *m_gitCache;
+    QThread *m_workerThread;
     git_repository *m_repo;
     QString m_url;
     QString m_branch;
@@ -61,6 +67,7 @@ private:
     mutable bool m_diffDirty;
 
     GitCommitList *m_log;
+
 };
 
 #endif

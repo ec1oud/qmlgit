@@ -4,8 +4,6 @@ import Git 1.0
 
 Item {
     id: logView
-    property alias repoUrl: gitLog.repoUrl
-    property alias branch: gitLog.currentBranch
     property alias currentItem: list.currentItem
     property bool details: false
     property string currentCommit
@@ -21,18 +19,13 @@ Item {
         id: pal
     }
 
-    Git {
-        id: gitLog
-        repoUrl: log.repoUrl
-    }
-
     ListView {
         id: list
         anchors.fill: parent
         clip: true
         focus: true
 
-        model: gitLog.logModel
+        model: git.logModel
         delegate: commitDelegate
 
         Keys.onDownPressed: incrementCurrentIndex()
@@ -58,6 +51,7 @@ Item {
                     logView.committer = committer
                     logView.committerEmail = committerEmail
                     logView.currentCommit = oid
+                    git.currentCommit = oid
                 }
             }
 

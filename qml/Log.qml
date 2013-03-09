@@ -6,11 +6,6 @@ import Git 1.0
 Item {
     anchors.fill: parent
 
-    Git {
-        id: git
-        repoUrl: root.repoUrl
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 4
@@ -26,6 +21,7 @@ Item {
                 id: comboBox
                 model: git.branches
                 implicitWidth: 200
+                onSelectedTextChanged: git.currentBranch = selectedText
             }
             Label {
                 id: authorLabel
@@ -45,8 +41,6 @@ Item {
                 width: details ? parent.width/3 : parent.width
                 height: parent.height
 
-                repoUrl: git.repoUrl
-                branch: comboBox.selectedText
                 Behavior on width { NumberAnimation { duration: 100} }
             }
             SplitView {
@@ -71,7 +65,6 @@ Item {
                 DiffView {
                     width: parent.width
                     height: 120
-                    commit: logView.currentCommit
                 }
             }
         }
