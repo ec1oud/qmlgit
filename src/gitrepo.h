@@ -19,6 +19,7 @@ class Git : public QObject
     Q_PROPERTY(QString currentBranch READ currentBranch WRITE setCurrentBranch NOTIFY currentBranchChanged)
     Q_PROPERTY(QString currentCommit READ currentCommit WRITE setCurrentCommit NOTIFY currentCommitChanged)
     Q_PROPERTY(QAbstractItemModel *logModel READ logModel NOTIFY modelChanged)
+    Q_PROPERTY(QString statusMessage READ statusMessage NOTIFY statusMessageChanged)
 
 public:
     Git();
@@ -38,6 +39,8 @@ public:
     QString currentCommit() const;
     void setCurrentCommit(const QString &commit);
 
+    QString statusMessage() const { return m_statusMessage; }
+
     QAbstractItemModel *logModel();
 
 public slots:
@@ -51,8 +54,10 @@ signals:
     void branchesChanged();
     void currentBranchChanged();
     void currentCommitChanged();
+    void statusMessageChanged();
 
 private:
+    void setStatusMessage(const QString &status);
     QString getDiff() const;
     void clearLog();
 
@@ -62,6 +67,7 @@ private:
     QString m_url;
     QString m_branch;
     QString m_commit;
+    QString m_statusMessage;
 
     mutable QString m_diff;
     mutable bool m_diffDirty;

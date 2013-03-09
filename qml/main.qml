@@ -84,7 +84,7 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.margins: 4
             Label {
-                text: "Loading..."
+                text: git.statusMessage
             }
             Item {
                 Layout.horizontalSizePolicy: Layout.Expanding

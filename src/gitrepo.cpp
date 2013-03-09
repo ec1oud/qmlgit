@@ -53,6 +53,7 @@ void Git::setRepoUrl(const QString &url)
 
             connect(m_workerThread, &QThread::started, m_gitCache, &GitCache::doWork);
             connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
+            connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
         }
     }
 }
@@ -140,6 +141,12 @@ QString Git::diff() const
     if (!m_commit.isEmpty())
         return m_gitCache->diff(m_commit);
     return QString();
+}
+
+void Git::setStatusMessage(const QString &status)
+{
+    m_statusMessage = status;
+    emit statusMessageChanged();
 }
 
 QML_DECLARE_TYPE(Git)
