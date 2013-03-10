@@ -1,6 +1,14 @@
+TARGET = qmlgit
+CONFIG += link_pkgconfig
+CONFIG += console
 
-CONFIG +=link_pkgconfig
+QT += quick widgets testlib
 PKGCONFIG += libgit2
+
+RESOURCES += \
+    ../resources.qrc
+
+OTHER_FILES += ../qml/*
 
 SOURCES += \
     $$PWD/beziercurve.cpp \
