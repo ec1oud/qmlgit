@@ -20,6 +20,12 @@ static int printer(
   return 0;
 }
 
+GitCache::GitCache(git_repository *repo)
+    : m_repo(repo)
+{
+    Q_ASSERT(repo);
+}
+
 GitCache::~GitCache()
 {
     foreach (const QString &branch, m_branches.keys())
@@ -33,16 +39,47 @@ void GitCache::loadBranch(const QString &branch)
     Q_ASSERT(m_repo);
     Q_ASSERT(!branch.isEmpty());
 
-    qDebug() << "load branch in thread: " << thread()->currentThreadId();
+    if (m_branches.contains(branch)) {
+        emit branchLoaded(branch);
+        return;
+    }
+    QMutexLocker locker(&m_todoMutex);
+    m_branchTodo.push(branch);
+}
 
+void GitCache::loadDiff(const QString &commitString)
+{
+    if (!m_repo)
+        return;
+
+    if (m_diffs.contains(commitString)) {
+        emit diffLoaded(commitString);
+        return;
+    }
+
+    QMutexLocker locker(&m_todoMutex);
+    m_diffTodo.push(commitString);
+}
+
+void GitCache::doWork()
+{
+    processDiff();
+    processBranch();
+}
+
+void GitCache::processBranch()
+{
+    QMutexLocker locker(&m_todoMutex);
+    if (m_branchTodo.isEmpty())
+        return;
+    QString branch = m_branchTodo.pop();
+    locker.unlock();
 
     if (m_branches.contains(branch)) {
         emit branchLoaded(branch);
         return;
     }
-
     emit statusChanged(QStringLiteral("Loading branch..."));
-    QThread::sleep(3);
 
     git_reference *ref;
     int error = git_reference_lookup(&ref, m_repo, branch.toUtf8().constData());
@@ -63,6 +100,7 @@ void GitCache::loadBranch(const QString &branch)
     error = git_revwalk_push(walk, &oid);
     Q_ASSERT(error == 0);
 
+    int count = 0;
     while (git_revwalk_next(&oid, walk) == 0) {
         error = git_commit_lookup(&wcommit, m_repo, &oid);
         if (!error) {
@@ -70,6 +108,9 @@ void GitCache::loadBranch(const QString &branch)
         } else {
             qWarning() << "Error looking up commit!";
         }
+        ++count;
+        if (count % 100 == 0)
+            emit statusChanged(QString("%1 commits loaded...").arg(count));
     }
 
     git_revwalk_free(walk);
@@ -77,18 +118,21 @@ void GitCache::loadBranch(const QString &branch)
     emit statusChanged(QString());
 }
 
-void GitCache::loadDiff(const QString &commitString)
+void GitCache::processDiff()
 {
-    if (!m_repo)
+    QMutexLocker locker(&m_todoMutex);
+    if (m_diffTodo.isEmpty())
         return;
+
+    QString commitString = m_diffTodo.pop();
+    locker.unlock();
 
     if (m_diffs.contains(commitString)) {
         emit diffLoaded(commitString);
         return;
     }
-    emit statusChanged(QStringLiteral("Loading diff..."));
 
-    QThread::sleep(3);
+    emit statusChanged(QStringLiteral("Loading diff..."));
 
     git_diff_options opts = GIT_DIFF_OPTIONS_INIT;
     git_diff_list *diff;

@@ -56,8 +56,7 @@ signals:
     void currentCommitChanged();
     void statusMessageChanged();
 
-    void loadBranch(QString);
-    void loadDiff(QString);
+    void updateCache();
 
 private:
     void setStatusMessage(const QString &status);

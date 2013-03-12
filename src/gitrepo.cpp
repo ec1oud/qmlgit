@@ -42,14 +42,9 @@ void Git::setRepoUrl(const QString &url)
     if (QDir::isAbsolutePath(url)) {
         // this probably needs unicode fixing on non-linux FIXME
         if (0 == git_repository_open_ext(&m_repo, url.toUtf8().data(), 0, NULL)) {
-            emit repoUrlChanged();
             m_diffDirty = true;
-            emit diffChanged();
-            emit modelChanged();
-            emit branchesChanged();
             m_gitCache = new GitCache(m_repo);
-            connect(this, &Git::loadBranch, m_gitCache, &GitCache::loadBranch);
-            connect(this, &Git::loadDiff, m_gitCache, &GitCache::loadDiff);
+            connect(this, &Git::updateCache, m_gitCache, &GitCache::doWork);
 
             connect(m_gitCache, &GitCache::branchLoaded, this, &Git::branchLoaded);
             connect(m_gitCache, &GitCache::diffLoaded, this, &Git::diffLoaded);
@@ -58,6 +53,11 @@ void Git::setRepoUrl(const QString &url)
             connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
             connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
             m_workerThread->start();
+
+            emit repoUrlChanged();
+            emit diffChanged();
+            emit modelChanged();
+            emit branchesChanged();
         }
     }
 }
@@ -99,8 +99,10 @@ QString Git::currentBranch() const
 void Git::setCurrentBranch(const QString &branch)
 {
     m_branch = branch;
-    if (!branch.isEmpty())
-        emit loadBranch(branch);
+    if (!branch.isEmpty()) {
+        m_gitCache->loadBranch(branch);
+        emit updateCache();
+    }
 }
 
 void Git::branchLoaded(const QString &branch)
@@ -111,9 +113,10 @@ void Git::branchLoaded(const QString &branch)
     }
 }
 
-void Git::diffLoaded(const QString &)
+void Git::diffLoaded(const QString &commit)
 {
-    emit diffChanged();
+    if (commit == m_commit)
+        emit diffChanged();
 }
 
 QString Git::currentCommit() const
@@ -124,8 +127,10 @@ QString Git::currentCommit() const
 void Git::setCurrentCommit(const QString &commit)
 {
     m_commit = commit;
-    if (!m_commit.isEmpty())
-        emit loadDiff(commit);
+    if (!m_commit.isEmpty()) {
+        m_gitCache->loadDiff(commit);
+        emit updateCache();
+    }
     emit diffChanged();
 }
 
