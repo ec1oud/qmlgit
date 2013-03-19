@@ -5,14 +5,9 @@ import Git 1.0
 Item {
     anchors.fill: parent
 
-    Git {
-        id: git
-        repoUrl: root.repoUrl
-    }
-
     ListView {
         anchors.fill: parent
-        model: git.branches
+//        model: git.branches
         delegate: Item {
             height: 30
             width: 100

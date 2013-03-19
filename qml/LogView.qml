@@ -24,6 +24,7 @@ Item {
         anchors.fill: parent
         clip: true
         focus: true
+        activeFocusOnTab: true
 
         model: git.logModel
         delegate: commitDelegate
@@ -79,6 +80,7 @@ Item {
                         list.currentIndex = index
                         logView.details = true
                     }
+                    list.forceActiveFocus()
                 }
             }
         }

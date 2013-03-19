@@ -36,8 +36,14 @@ void Git::setRepoUrl(const QString &url)
     git_repository_free(m_repo);
     m_repo = 0;
     m_commit.clear();
-    if (m_gitCache)
+    m_branch.clear();
+    if (m_gitCache) {
+        m_workerThread->quit();
         m_gitCache->deleteLater();
+    }
+    m_gitCache = 0;
+
+    m_log->setBranchData(QVector<git_commit*>());
 
     if (QDir::isAbsolutePath(url)) {
         // this probably needs unicode fixing on non-linux FIXME
@@ -53,13 +59,12 @@ void Git::setRepoUrl(const QString &url)
             connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
             connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
             m_workerThread->start();
-
-            emit repoUrlChanged();
-            emit diffChanged();
-            emit modelChanged();
-            emit branchesChanged();
         }
     }
+    emit repoUrlChanged();
+    emit diffChanged();
+    emit modelChanged();
+    emit branchesChanged();
 }
 
 bool Git::isValidRepository() const
@@ -67,7 +72,7 @@ bool Git::isValidRepository() const
     return m_repo != 0;
 }
 
-QStringList Git::branches() const
+QStringList Git::branches()
 {
     if (!m_repo)
         return QStringList();
@@ -85,7 +90,6 @@ QStringList Git::branches() const
         if (git_reference_is_branch(ref))
             b.append(refname);
     }
-
     git_strarray_free(&ref_list);
 
     return b;
@@ -100,6 +104,7 @@ void Git::setCurrentBranch(const QString &branch)
 {
     m_branch = branch;
     if (!branch.isEmpty()) {
+        Q_ASSERT(m_gitCache);
         m_gitCache->loadBranch(branch);
         emit updateCache();
     }

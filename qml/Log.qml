@@ -21,7 +21,7 @@ Item {
                 id: comboBox
                 model: git.branches
                 implicitWidth: 200
-                onSelectedTextChanged: git.currentBranch = selectedText
+                onCurrentTextChanged: git.currentBranch = currentText
             }
             Label {
                 id: authorLabel

@@ -32,7 +32,7 @@ public:
 
     bool isValidRepository() const;
 
-    QStringList branches() const;
+    QStringList branches();
     QString currentBranch() const;
     void setCurrentBranch(const QString &branch);
 

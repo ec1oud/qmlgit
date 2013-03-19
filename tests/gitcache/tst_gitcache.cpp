@@ -92,9 +92,9 @@ void tst_gitCache::references()
 
     }
     git_strarray_free(&references);
-
-
 }
+
+
 
 class GitReference
 {

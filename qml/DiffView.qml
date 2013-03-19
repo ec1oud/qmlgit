@@ -12,6 +12,7 @@ Rectangle {
         anchors.fill: parent
         text: git.diff
         readOnly: true
+        selectByKeyboard: true
     }
 
     DiffHighlighter {

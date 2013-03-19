@@ -6,16 +6,10 @@ import Git 1.0
 
 Rectangle {
 
-    Git {
-        id: git
-        repoUrl: root.repoUrl
-        onRepoUrlChanged: console.log(repoUrl)
-    }
-
     TextArea {
         id: textArea
         anchors.fill: parent
-        text: git.diff
+//        text: git.diff
         readOnly: true
     }
 
