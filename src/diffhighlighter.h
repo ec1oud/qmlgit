@@ -9,27 +9,32 @@ class Highlighter : public QSyntaxHighlighter
 public:
     Highlighter(QTextDocument *parent)
         : QSyntaxHighlighter(parent)
-    {}
+    {
+        normal.setFontWeight(QFont::Light);
+        normal.setForeground(QColor("#585858"));
+        diffRemoved.setFontWeight(QFont::Normal);
+        diffRemoved.setForeground(QColor("#D5271E"));
+        diffAdded.setFontWeight(QFont::Normal);
+        diffAdded.setForeground(Qt::darkGreen);
+    }
 
-    void highlightBlock ( const QString & text )
+    void highlightBlock(const QString & text)
     {
         if (text.isEmpty())
             return;
-
-        QTextCharFormat diffRemoved;
-        diffRemoved.setFontWeight(QFont::Bold);
-        diffRemoved.setForeground(QColor("#D5271E"));
-
-        QTextCharFormat diffAdded;
-        diffAdded.setFontWeight(QFont::Bold);
-        diffAdded.setForeground(Qt::darkGreen);
 
         if (text.at(0) == QLatin1Char('-')) {
             setFormat(0, text.length(), diffRemoved);
         } else if (text.at(0) == QLatin1Char('+')) {
             setFormat(0, text.length(), diffAdded);
+        } else {
+            setFormat(0, text.length(), normal);
         }
     }
+private:
+    QTextCharFormat diffAdded;
+    QTextCharFormat diffRemoved;
+    QTextCharFormat normal;
 };
 
 class DiffHighlighter : public QQuickItem

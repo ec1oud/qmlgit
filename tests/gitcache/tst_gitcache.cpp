@@ -96,6 +96,51 @@ void tst_gitCache::references()
 
 }
 
+class GitReference
+{
+public:
+    GitReference(git_reference *ref) : m_ref(ref)
+    {}
+    // todo: copy and assignment ctor...
+
+    bool isBranch() const;
+    bool isTag() const;
+    bool isRemote() const;
+    QString name() const; // some form of pretty name
+    git_oid oid() const;
+
+private:
+    git_reference *m_ref;
+};
+
+bool GitReference::isBranch() const
+{
+    return git_reference_is_branch(m_ref);
+}
+
+bool GitReference::isTag() const
+{
+    // fixme
+    return false;
+}
+
+bool GitReference::isRemote() const
+{
+    return git_reference_is_remote(m_ref);
+}
+
+QString GitReference::name() const
+{
+    return QString::fromUtf8(git_reference_name(m_ref));
+}
+
+git_oid GitReference::oid() const
+{
+    return git_oid();
+}
+
+
+
 QTEST_MAIN(tst_gitCache)
 #include "tst_gitcache.moc"
 
