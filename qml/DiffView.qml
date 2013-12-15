@@ -35,14 +35,13 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
+import QtQuick 2.1
+import QtQuick.Controls 1.1
 
 import DiffHighlighter 1.0
 import Git 1.0
 
 Rectangle {
-
     TextArea {
         id: textArea
         font.family: "mono"

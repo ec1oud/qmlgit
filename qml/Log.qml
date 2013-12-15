@@ -99,12 +99,10 @@ Item {
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
                 }
-/*
                 DiffView {
                     width: parent.width
                     height: 120
                 }
-    */
             }
         }
     }

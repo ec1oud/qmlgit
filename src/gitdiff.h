@@ -44,7 +44,7 @@
 
 #include <QObject>
 
-#include <git2.h>
+#include <qgit2.h>
 
 #include "gitrepo.h"
 
@@ -52,7 +52,7 @@ class GitDiff : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString repoUrl READ repoUrl WRITE setRepoUrl NOTIFY urlChanged)
+//    Q_PROPERTY(QString repoUrl READ repoUrl WRITE setRepoUrl NOTIFY urlChanged)
     Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
 
 public:
@@ -60,7 +60,7 @@ public:
 
     QString diff() const;
     void setRepoUrl(const QString &repoUrl);
-    QString repoUrl() const;
+//    QString repoUrl() const;
 
 Q_SIGNALS:
     void urlChanged();

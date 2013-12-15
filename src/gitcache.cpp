@@ -81,16 +81,13 @@ void GitCache::loadBranch(const QString &branch)
 
 void GitCache::loadDiff(const QString &commitString)
 {
-//     if (!m_repo)
-//         return;
-//
-//     if (m_diffs.contains(commitString)) {
-//         emit diffLoaded(commitString);
-//         return;
-//     }
-//
-//     QMutexLocker locker(&m_todoMutex);
-//     m_diffTodo.push(commitString);
+     if (m_diffs.contains(commitString)) {
+         emit diffLoaded(commitString);
+         return;
+     }
+
+     QMutexLocker locker(&m_todoMutex);
+     m_diffTodo.push(commitString);
 }
 
 void GitCache::doWork()
@@ -126,7 +123,6 @@ void GitCache::processBranch()
         if (count % 100 == 0) {
             emit statusChanged(QString("%1 commits loaded...").arg(count));
         }
-        qDebug() << "loading commit:" << count;
     }
 
     emit branchLoaded(branch);
@@ -135,20 +131,20 @@ void GitCache::processBranch()
 
 void GitCache::processDiff()
 {
-//     QMutexLocker locker(&m_todoMutex);
-//     if (m_diffTodo.isEmpty())
-//         return;
-//
-//     QString commitString = m_diffTodo.pop();
-//     locker.unlock();
-//
-//     if (m_diffs.contains(commitString)) {
-//         emit diffLoaded(commitString);
-//         return;
-//     }
-//
-//     emit statusChanged(QStringLiteral("Loading diff..."));
-//
+     QMutexLocker locker(&m_todoMutex);
+     if (m_diffTodo.isEmpty())
+         return;
+
+     QString commitString = m_diffTodo.pop();
+     locker.unlock();
+
+     if (m_diffs.contains(commitString)) {
+         emit diffLoaded(commitString);
+         return;
+     }
+
+     emit statusChanged(QStringLiteral("Loading diff..."));
+
 //     git_diff_options opts = GIT_DIFF_OPTIONS_INIT;
 //     git_diff_list *diff;
 //
@@ -188,7 +184,10 @@ void GitCache::processDiff()
 //         git_tree_free(tree1);
 //         git_tree_free(tree2);
 //     }
-//     QString strDiff;
+     QString strDiff;
+
+     strDiff = QStringLiteral("+-+- diff placeholder for: ") + commitString;
+
 //     int ret = git_diff_print_patch(diff, printer, &strDiff);
 //     if (ret != 0) {
 //         m_diffs[commitString] = QString("Error: Formatting diff failed (%1)").arg(ret);
@@ -197,10 +196,10 @@ void GitCache::processDiff()
 //
 //     git_diff_list_free(diff);
 //
-//     if (strDiff.isEmpty())
-//         strDiff = QStringLiteral("No changes in repository.");
-//
-//     m_diffs[commitString] = strDiff;
-//     emit diffLoaded(commitString);
-//     emit statusChanged(QString());
+     if (strDiff.isEmpty())
+         strDiff = QStringLiteral("No changes in repository.");
+
+     m_diffs[commitString] = strDiff;
+     emit diffLoaded(commitString);
+     emit statusChanged(QString());
 }

@@ -46,7 +46,7 @@ Rectangle {
     TextArea {
         id: textArea
         anchors.fill: parent
-//        text: git.diff
+        text: git.diff
         readOnly: true
     }
 

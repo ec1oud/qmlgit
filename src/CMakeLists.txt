@@ -11,7 +11,7 @@ set(qmlgit_SRCS
     diffhighlighter.cpp
     gitcache.cpp
     gitcommitlist.cpp
-#     gitdiff.cpp
+    gitdiff.cpp
     gitrepo.cpp
     main.cpp
 )
