@@ -40,7 +40,7 @@
 #ifndef GITCOMMITLIST_H
 #define GITCOMMITLIST_H
 
-#include <git2.h>
+#include <qgit2.h>
 #include <QAbstractListModel>
 
 #include "gitcache.h"
@@ -67,15 +67,15 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    void setBranchData(const QVector<git_commit*> &data);
+    void setBranchData(const QVector<LibQGit2::Commit> &data);
 
 private:
     void update();
     void loadBranch();
     void clear();
 
-    git_repository *m_repo;
-    QVector<git_commit*> m_commits;
+//     LibQGit2::Repository m_repo;
+    QVector<LibQGit2::Commit> m_commits;
 };
 
 #endif

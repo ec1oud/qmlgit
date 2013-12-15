@@ -42,6 +42,8 @@
 #include <QThread>
 #include <QDebug>
 
+using namespace LibQGit2;
+
 QHash<int, QByteArray> GitCommitList::roleNames() const
 {
     QHash<int, QByteArray> roles;
@@ -57,7 +59,7 @@ QHash<int, QByteArray> GitCommitList::roleNames() const
     return roles;
 }
 
-void GitCommitList::setBranchData(const QVector<git_commit*> &data)
+void GitCommitList::setBranchData(const QVector<Commit> &data)
 {
     beginResetModel();
     m_commits = data;
@@ -77,58 +79,27 @@ QVariant GitCommitList::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    QVariant ret;
-    git_commit *commit = m_commits.at(index.row());
+    Commit commit = m_commits.at(index.row());
 
     switch (role) {
-    case Message: {
-        ret = QString(git_commit_message(commit));
-        break;
-    }
-    case ShortMessage: {
-        QString msg = QString(git_commit_message(commit));
-        int index = msg.indexOf('\n');
-        ret = msg.left(index);
-        break;
-    }
-    case Author: {
-        const git_signature *cauth = git_commit_author(commit);
-        ret = QString(cauth->name);
-        break;
-    }
-    case AuthorEmail: {
-        const git_signature *cauth = git_commit_author(commit);
-        ret = QString(cauth->email);
-        break;
-    }
-    case Committer: {
-        const git_signature *com = git_commit_author(commit);
-        ret = QString(com->name);
-        break;
-    }
-    case CommitterEmail: {
-        const git_signature *com = git_commit_author(commit);
-        ret = QString(com->email);
-        break;
-    }
+    case Message:
+        return commit.message();
+    case ShortMessage:
+        return commit.shortMessage();
+    case Author:
+        return commit.author().name();
+    case AuthorEmail:
+        return commit.author().email();
+    case Committer:
+        return commit.committer().name();
+    case CommitterEmail:
+        return commit.committer().email();
     case ParentCount:
-        ret = git_commit_parentcount(commit);
-        break;
-    case Time: {
-        QDateTime time;
-        git_time_t timeT = git_commit_time(commit);
-        time.setTime_t(timeT);
-        ret = QVariant(time);
-        break;
+        return commit.parentCount();
+    case Time:
+        return commit.dateTime();
+    case Oid:
+        return QString::fromUtf8(commit.oid().format());
     }
-    case Oid: {
-        const git_oid *oid = git_commit_id(commit);
-        char out[41];
-        out[40] = '\0';
-        git_oid_fmt(out, oid);
-        ret = QString(out);
-        break;
-    }
-    }
-    return ret;
+    return QVariant();
 }

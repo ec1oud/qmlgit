@@ -54,8 +54,10 @@
 #include <QDebug>
 #include <QQuickItem>
 
+using namespace LibQGit2;
+
 Git::Git()
-    : m_gitCache(0), m_workerThread(0), m_repo(0), m_diffDirty(true), m_log(new GitCommitList())
+    : m_workerThread(0), m_diffDirty(true), m_gitCache(0), m_log(new GitCommitList())
 {
     m_workerThread = new QThread(this);
     qDebug() << "main thread: " << thread()->currentThreadId();
@@ -63,40 +65,43 @@ Git::Git()
 
 Git::~Git()
 {
+    delete m_gitCache;
     delete m_log;
-    git_repository_free(m_repo);
 }
 
 void Git::setRepoUrl(const QString &url)
 {
     m_url = url;
-    git_repository_free(m_repo);
-    m_repo = 0;
     m_commit.clear();
     m_branch.clear();
+
+    try {
+        m_repository.discoverAndOpen(url);
+    } catch (const LibQGit2::Exception& ex) {
+        qDebug() << ex.what();
+        return;
+    }
+
     if (m_gitCache) {
         m_workerThread->quit();
         m_gitCache->deleteLater();
     }
     m_gitCache = 0;
 
-    m_log->setBranchData(QVector<git_commit*>());
+    m_log->setBranchData(QVector<Commit>());
 
     if (QDir::isAbsolutePath(url)) {
-        // this probably needs unicode fixing on non-linux FIXME
-        if (0 == git_repository_open_ext(&m_repo, url.toUtf8().data(), 0, NULL)) {
-            m_diffDirty = true;
-            m_gitCache = new GitCache(m_repo);
-            connect(this, &Git::updateCache, m_gitCache, &GitCache::doWork);
+        m_diffDirty = true;
+        m_gitCache = new GitCache(m_repository);
+        connect(this, &Git::updateCache, m_gitCache, &GitCache::doWork);
 
-            connect(m_gitCache, &GitCache::branchLoaded, this, &Git::branchLoaded);
-            connect(m_gitCache, &GitCache::diffLoaded, this, &Git::diffLoaded);
-            m_gitCache->moveToThread(m_workerThread);
+        connect(m_gitCache, &GitCache::branchLoaded, this, &Git::branchLoaded);
+        connect(m_gitCache, &GitCache::diffLoaded, this, &Git::diffLoaded);
+        m_gitCache->moveToThread(m_workerThread);
 
-            connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
-            connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
-            m_workerThread->start();
-        }
+        connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
+        connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
+        m_workerThread->start();
     }
     emit repoUrlChanged();
     emit diffChanged();
@@ -106,29 +111,17 @@ void Git::setRepoUrl(const QString &url)
 
 bool Git::isValidRepository() const
 {
-    return m_repo != 0;
+    return true; // m_repository.status() != 0;
 }
 
 QStringList Git::branches()
 {
-    if (!m_repo)
-        return QStringList();
     QStringList b;
-
-    git_strarray ref_list;
-    git_reference_list(&ref_list, m_repo, GIT_REF_LISTALL);
-
-    for (uint i = 0; i < ref_list.count; ++i) {
-        const char *refname;
-        refname = ref_list.strings[i];
-        git_reference *ref;
-        git_reference_lookup(&ref, m_repo, refname);
-
-        if (git_reference_is_branch(ref))
-            b.append(refname);
+    QVector<Reference> refs = m_repository.references();
+    foreach(const Reference &ref, refs) {
+        if (ref.isBranch())
+            b.append(ref.name());
     }
-    git_strarray_free(&ref_list);
-
     return b;
 }
 
@@ -196,4 +189,3 @@ void Git::setStatusMessage(const QString &status)
 
 QML_DECLARE_TYPE(Git)
 QML_DECLARE_TYPE(QAbstractItemModel)
-

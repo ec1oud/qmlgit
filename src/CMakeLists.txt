@@ -11,9 +11,11 @@ set(qmlgit_SRCS
     diffhighlighter.cpp
     gitcache.cpp
     gitcommitlist.cpp
-    gitdiff.cpp
+#     gitdiff.cpp
     gitrepo.cpp
     main.cpp
 )
 
-add_executable(qmlgit ${qmlgit_SRCS})
+qt5_add_resources(RES ../resources.qrc)
+add_executable(qmlgit ${qmlgit_SRCS} ${RES})
+target_link_libraries(qmlgit ${Qt5Quick_LIBRARIES} ${LibQGit2_LIBRARIES})

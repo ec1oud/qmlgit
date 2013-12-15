@@ -39,7 +39,7 @@
 #ifndef GITCACHE_H
 #define GITCACHE_H
 
-#include <git2.h>
+#include <qgit2.h>
 
 #include <QObject>
 #include <QHash>
@@ -53,10 +53,11 @@ class GitCache : public QObject
 {
     Q_OBJECT
 public:
-    GitCache(git_repository *repo);
+    GitCache(const LibQGit2::Repository &repo);
     ~GitCache();
 
-    QVector<git_commit*> branchData(const QString &branch) { return m_branches.value(branch); }
+    QVector<LibQGit2::Commit> branchData(const QString &branch) { return m_branches.value(branch); }
+
     QString diff(const QString &commit) {
         if (m_diffs.contains(commit))
             return m_diffs.value(commit);
@@ -81,9 +82,9 @@ private:
     void processBranch();
     void processDiff();
 
-    QHash<QString, QVector<git_commit*> > m_branches;
+    QHash<QString, QVector<LibQGit2::Commit> > m_branches;
     QHash<QString, QString> m_diffs;
-    git_repository *m_repo;
+    LibQGit2::Repository m_repo;
 
     QMutex m_todoMutex;
     QStack<QString> m_branchTodo;

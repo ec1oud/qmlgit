@@ -39,11 +39,13 @@
 #ifndef GITREPO_H
 #define GITREPO_H
 
-#include <git2.h>
 #include <QString>
 #include <QDir>
 #include <QDebug>
 
+#include <qgit2.h>
+
+#include "gitcache.h"
 #include "gitcommitlist.h"
 
 class Git : public QObject
@@ -99,10 +101,8 @@ private:
     void setStatusMessage(const QString &status);
     QString getDiff() const;
     void clearLog();
-
-    GitCache *m_gitCache;
+    
     QThread *m_workerThread;
-    git_repository *m_repo;
     QString m_url;
     QString m_branch;
     QString m_commit;
@@ -111,8 +111,9 @@ private:
     mutable QString m_diff;
     mutable bool m_diffDirty;
 
+    LibQGit2::Repository m_repository;
     GitCommitList *m_log;
-
+    GitCache *m_gitCache;
 };
 
 #endif

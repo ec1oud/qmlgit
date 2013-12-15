@@ -64,14 +64,14 @@ Item {
                 id: authorLabel
                 text: (logView.author.length > 0) ? logView.author.concat(" <", logView.authorEmail, ">") : ""
                 horizontalAlignment: Text.AlignRight
-                Layout.horizontalSizePolicy: Layout.Expanding
+                Layout.fillWidth: true
             }
         }
 
         Row {
             height: parent.height - 40
-            Layout.verticalSizePolicy: Layout.Expanding
-            Layout.horizontalSizePolicy: Layout.Expanding
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
             LogView {
                 id: logView
@@ -99,10 +99,12 @@ Item {
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
                 }
+/*
                 DiffView {
                     width: parent.width
                     height: 120
                 }
+    */
             }
         }
     }
