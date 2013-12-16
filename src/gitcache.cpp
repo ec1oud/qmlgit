@@ -42,20 +42,9 @@
 #include <QThread>
 #include <QDebug>
 
-using namespace LibQGit2;
+#include <qgit2.h>
 
-// static int printer(
-//   const git_diff_delta */*delta*/,
-//   const git_diff_range */*range*/,
-//   char /*usage*/,
-//   const char *line,
-//   size_t /*line_len*/,
-//   void *data)
-// {
-//   QString *strDiff = static_cast<QString*>(data);
-//   strDiff->append(line);
-//   return 0;
-// }
+using namespace LibQGit2;
 
 GitCache::GitCache(const Repository &repo)
     : m_repo(repo)
@@ -183,19 +172,22 @@ void GitCache::processDiff()
 //         git_diff_tree_to_tree(&diff, m_repo, tree2, tree1, &opts);
 //         git_tree_free(tree1);
 //         git_tree_free(tree2);
-//     }
-     QString strDiff;
+     //     }
 
-     strDiff = QStringLiteral("+-+- diff placeholder for: ") + commitString;
 
-//     int ret = git_diff_print_patch(diff, printer, &strDiff);
-//     if (ret != 0) {
-//         m_diffs[commitString] = QString("Error: Formatting diff failed (%1)").arg(ret);
-//         return;
-//     }
-//
-//     git_diff_list_free(diff);
-//
+     Diff diff;
+     if (commitString.isEmpty()) {
+         diff = m_repo.diffIndexToWorkdir();
+     } else {
+         OId oid;
+         oid.fromString(commitString);
+         Commit commit = m_repo.lookupCommit(oid);
+         diff = m_repo.diffCommitToParent(commit);
+     }
+
+
+     QString strDiff = diff.toPlainText();
+//     strDiff = QStringLiteral("+-+- diff placeholder for: ") + commitString;
      if (strDiff.isEmpty())
          strDiff = QStringLiteral("No changes in repository.");
 
