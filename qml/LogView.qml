@@ -58,6 +58,7 @@ Item {
 
     ScrollView {
         anchors.fill: parent
+        frameVisible: true
         ListView {
             id: list
             anchors.fill: parent
@@ -70,7 +71,10 @@ Item {
             Keys.onDownPressed: incrementCurrentIndex()
             Keys.onUpPressed: decrementCurrentIndex()
 
-            Component.onCompleted: forceActiveFocus()
+            Component.onCompleted: {
+                currentIndex = 0
+                forceActiveFocus()
+            }
         }
     }
 
@@ -119,5 +123,4 @@ Item {
             }
         }
     }
-
 }

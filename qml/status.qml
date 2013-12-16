@@ -35,24 +35,32 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
+import QtQuick 2.1
+import QtQuick.Controls 1.1
+import QtQuick.Layouts 1.1
 import Git 1.0
 
-Item {
+ColumnLayout {
     anchors.fill: parent
 
+    Label {
+        text: "Git repository: " + git.repoUrl
+    }
+
     ListView {
+        y: 4
         anchors.fill: parent
-//        model: git.branches
+        model: git.branches
+        Layout.fillWidth: true
+        Layout.fillHeight: true
         delegate: Item {
             height: 30
             width: 100
             CheckBox {
+                x: 4
                 anchors.fill: parent
                 text: modelData
             }
         }
     }
 }
-

@@ -78,8 +78,6 @@ Item {
                 id: logView
                 width: parent.width / 3
                 height: parent.height
-
-                Behavior on width { NumberAnimation { duration: 100} }
             }
             SplitView {
                 id: splitter
@@ -87,16 +85,17 @@ Item {
                 width: parent.width / 3 * 2
                 height: parent.height
                 ScrollView {
-                    frameVisible: true
+//                    frameVisible: true
                     id: commitView
                     width: parent.width
                     height: 120
-                    Text {
-                        x: 4
-                        y: 4
-                        width: splitter.width - 40
-                        text: logView.message.concat("\n", logView.date)
+                    TextArea {
+                        x: 0
+                        y: 0
+                        width: splitter.width
+                        text: logView.message.concat("\n", logView.date).concat(logView.currentCommit)
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        selectByKeyboard: true
                     }
                 }
                 DiffView {
