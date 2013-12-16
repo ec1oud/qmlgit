@@ -35,9 +35,9 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick 2.1
+import QtQuick.Controls 1.1
+import QtQuick.Layouts 1.1
 import Git 1.0
 
 Item {
@@ -72,10 +72,11 @@ Item {
             height: parent.height - 40
             Layout.fillHeight: true
             Layout.fillWidth: true
+            spacing: 4
 
             LogView {
                 id: logView
-                width: details ? parent.width/3 : parent.width
+                width: parent.width / 3
                 height: parent.height
 
                 Behavior on width { NumberAnimation { duration: 100} }
@@ -83,8 +84,7 @@ Item {
             SplitView {
                 id: splitter
                 orientation: Qt.Vertical
-                visible: logView.details
-                width: parent.width/3*2
+                width: parent.width / 3 * 2
                 height: parent.height
                 ScrollView {
                     frameVisible: true
@@ -107,4 +107,3 @@ Item {
         }
     }
 }
-

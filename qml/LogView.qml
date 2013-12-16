@@ -36,13 +36,13 @@
 ****************************************************************************/
 
 import QtQuick 2.1
+import QtQuick.Controls 1.1
 
 import Git 1.0
 
 Item {
     id: logView
     property alias currentItem: list.currentItem
-    property bool details: false
     property string currentCommit
 
     property string author
@@ -56,27 +56,29 @@ Item {
         id: pal
     }
 
-    ListView {
-        id: list
+    ScrollView {
         anchors.fill: parent
-        clip: true
-        focus: true
-        activeFocusOnTab: true
+        ListView {
+            id: list
+            anchors.fill: parent
+            focus: true
+            activeFocusOnTab: true
 
-        model: git.logModel
-        delegate: commitDelegate
+            model: git.logModel
+            delegate: commitDelegate
 
-        Keys.onDownPressed: incrementCurrentIndex()
-        Keys.onUpPressed: decrementCurrentIndex()
+            Keys.onDownPressed: incrementCurrentIndex()
+            Keys.onUpPressed: decrementCurrentIndex()
 
-        Component.onCompleted: forceActiveFocus()
+            Component.onCompleted: forceActiveFocus()
+        }
     }
 
     Component {
         id: commitDelegate
 
         Item {
-            width: parent.width - 8
+            width: parent.width
             height: messageText.height + 8
 
             property bool current: ListView.isCurrentItem
@@ -111,12 +113,7 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (list.currentIndex == index) {
-                        logView.details = !logView.details
-                    } else {
-                        list.currentIndex = index
-                        logView.details = true
-                    }
+                    list.currentIndex = index
                     list.forceActiveFocus()
                 }
             }

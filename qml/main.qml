@@ -84,14 +84,14 @@ ApplicationWindow {
         anchors.fill: parent
         width: parent.width
 
-         currentIndex: 1
-         Tab {
-             title: "Status"
-             Loader {
-                 anchors.fill: parent
-                 source: visible ? "qrc:/qml/status.qml" : ""
-             }
-         }
+        currentIndex: 1
+        Tab {
+            title: "Status"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/status.qml" : ""
+            }
+        }
         Tab {
             title: "Log"
             Loader {
@@ -99,20 +99,20 @@ ApplicationWindow {
                 source: visible ? "qrc:/qml/Log.qml" : ""
             }
         }
-         Tab {
-             title: "Diff"
-             Loader {
-                 anchors.fill: parent
-                 source: visible ? "qrc:/qml/diff.qml" : ""
-             }
-         }
-         Tab {
-             title: "Branches"
-             Loader {
-                 anchors.fill: parent
-                 source: visible ? "qrc:/qml/branches.qml" : ""
-             }
-         }
+        Tab {
+            title: "Diff"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/DiffView.qml" : ""
+            }
+        }
+        Tab {
+            title: "Branches"
+            Loader {
+                anchors.fill: parent
+                source: visible ? "qrc:/qml/branches.qml" : ""
+            }
+        }
     }
 
     statusBar: StatusBar {
