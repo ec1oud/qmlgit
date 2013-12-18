@@ -43,6 +43,11 @@ import Git 1.0
 Item {
     anchors.fill: parent
 
+    GitModel {
+        id: logModel
+        git: gitRepo
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 4
@@ -56,9 +61,9 @@ Item {
             }
             ComboBox {
                 id: comboBox
-                model: git.branches
+                model: gitRepo.branches
                 implicitWidth: 200
-                onCurrentTextChanged: git.currentBranch = currentText
+                onCurrentTextChanged: logModel.currentBranch = currentText
             }
             Label {
                 id: authorLabel
@@ -76,6 +81,7 @@ Item {
 
             LogView {
                 id: logView
+                gitModel: logModel
                 width: parent.width / 3
                 height: parent.height
             }
@@ -101,6 +107,7 @@ Item {
                 DiffView {
                     width: parent.width
                     height: 120
+                    text: logModel.diff
                 }
             }
         }

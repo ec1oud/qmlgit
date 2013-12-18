@@ -1,3 +1,9 @@
 *.kdev4
 build
+*.o
+*.pro.user*
+*.swp
+moc_*.cpp
+*.moc
+Makefile
 

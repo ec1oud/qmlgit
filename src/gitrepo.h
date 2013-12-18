@@ -46,18 +46,13 @@
 #include <qgit2.h>
 
 #include "gitcache.h"
-#include "gitcommitlist.h"
 
 class Git : public QObject
 {
     Q_OBJECT
 
     Q_PROPERTY(QString repoUrl READ repoUrl WRITE setRepoUrl NOTIFY repoUrlChanged)
-    Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
     Q_PROPERTY(QStringList branches READ branches NOTIFY branchesChanged)
-    Q_PROPERTY(QString currentBranch READ currentBranch WRITE setCurrentBranch NOTIFY currentBranchChanged)
-    Q_PROPERTY(QString currentCommit READ currentCommit WRITE setCurrentCommit NOTIFY currentCommitChanged)
-    Q_PROPERTY(QAbstractItemModel *logModel READ logModel NOTIFY modelChanged)
     Q_PROPERTY(QString statusMessage READ statusMessage NOTIFY statusMessageChanged)
 
 public:
@@ -67,34 +62,20 @@ public:
     QString repoUrl() const { return m_url; }
     void setRepoUrl(const QString &url);
 
-    QString diff() const;
-
     bool isValidRepository() const;
 
     QStringList branches();
-    QString currentBranch() const;
-    void setCurrentBranch(const QString &branch);
 
-    QString currentCommit() const;
-    void setCurrentCommit(const QString &commit);
+    GitCache *cache() const {
+        return m_gitCache;
+    }
 
     QString statusMessage() const { return m_statusMessage; }
 
-    QAbstractItemModel *logModel();
-
-public slots:
-    void branchLoaded(const QString &branch);
-    void diffLoaded(const QString &commit);
-
 signals:
     void repoUrlChanged();
-    void diffChanged();
-    void modelChanged();
     void branchesChanged();
-    void currentBranchChanged();
-    void currentCommitChanged();
     void statusMessageChanged();
-
     void updateCache();
 
 private:
@@ -104,15 +85,9 @@ private:
     
     QThread *m_workerThread;
     QString m_url;
-    QString m_branch;
-    QString m_commit;
     QString m_statusMessage;
 
-    mutable QString m_diff;
-    mutable bool m_diffDirty;
-
     LibQGit2::Repository m_repository;
-    GitCommitList *m_log;
     GitCache *m_gitCache;
 };
 

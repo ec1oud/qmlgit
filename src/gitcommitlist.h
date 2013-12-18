@@ -43,11 +43,18 @@
 #include <qgit2.h>
 #include <QAbstractListModel>
 
+#include "gitrepo.h"
 #include "gitcache.h"
 
 class GitCommitList : public QAbstractListModel
 {
     Q_OBJECT
+
+    Q_PROPERTY(Git *git READ git WRITE setGit NOTIFY gitChanged)
+
+    Q_PROPERTY(QString currentBranch READ currentBranch WRITE setCurrentBranch NOTIFY currentBranchChanged)
+    Q_PROPERTY(QString currentCommit READ currentCommit WRITE setCurrentCommit NOTIFY currentCommitChanged)
+    Q_PROPERTY(QString diff READ diff NOTIFY diffChanged)
 
 public:
     enum Roles {
@@ -62,6 +69,11 @@ public:
         Time
     };
 
+    GitCommitList();
+
+    Git *git() const { return m_repo; }
+    void setGit(Git *repo);
+
     virtual QHash<int, QByteArray> roleNames() const;
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -69,13 +81,45 @@ public:
 
     void setBranchData(const QVector<LibQGit2::Commit> &data);
 
+    QString diff() const;
+
+    QStringList branches() { return m_repo->branches(); }
+    QString currentBranch() const;
+    void setCurrentBranch(const QString &branch);
+
+    QString currentCommit() const;
+    void setCurrentCommit(const QString &commit);
+
+    Q_INVOKABLE void startDrag(const QString &oid);
+
+public slots:
+    void branchLoaded(const QString &branch);
+    void diffLoaded(const QString &commit);
+
+    void repoUrlChanged();
+
+signals:
+    void gitChanged();
+    void diffChanged();
+    void modelChanged();
+    void branchesChanged();
+    void currentBranchChanged();
+    void currentCommitChanged();
+
+    void updateCache();
+
 private:
     void update();
     void loadBranch();
     void clear();
 
-//     LibQGit2::Repository m_repo;
+    Git *m_repo;
     QVector<LibQGit2::Commit> m_commits;
+    QString m_branch;
+    QString m_commit;
+
+    mutable QString m_diff;
+    mutable bool m_diffDirty;
 };
 
 #endif

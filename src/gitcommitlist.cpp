@@ -44,6 +44,26 @@
 
 using namespace LibQGit2;
 
+GitCommitList::GitCommitList()
+    : m_diffDirty(true)
+{
+
+}
+
+void GitCommitList::setGit(Git *repo) {
+    m_repo = repo;
+    connect(m_repo, &Git::repoUrlChanged, this, &GitCommitList::repoUrlChanged);
+    connect(m_repo, &Git::branchesChanged, this, &GitCommitList::branchesChanged);
+
+    connect(m_repo->cache(), &GitCache::branchLoaded, this, &GitCommitList::branchLoaded);
+    connect(m_repo->cache(), &GitCache::diffLoaded, this, &GitCommitList::diffLoaded);
+
+    connect(this, &GitCommitList::updateCache, m_repo->cache(), &GitCache::doWork);
+
+    repoUrlChanged();
+    emit gitChanged();
+}
+
 QHash<int, QByteArray> GitCommitList::roleNames() const
 {
     QHash<int, QByteArray> roles;
@@ -102,4 +122,73 @@ QVariant GitCommitList::data(const QModelIndex &index, int role) const
         return QString::fromUtf8(commit.oid().format());
     }
     return QVariant();
+}
+
+QString GitCommitList::currentBranch() const
+{
+    return m_branch;
+}
+
+void GitCommitList::setCurrentBranch(const QString &branch)
+{
+    m_branch = branch;
+    if (!branch.isEmpty()) {
+        Q_ASSERT(m_repo->cache());
+        m_repo->cache()->loadBranch(branch);
+        emit updateCache();
+    }
+}
+
+void GitCommitList::branchLoaded(const QString &branch)
+{
+    if (branch == m_branch) {
+        setBranchData(m_repo->cache()->branchData(branch));
+        emit modelChanged();
+    }
+}
+
+void GitCommitList::diffLoaded(const QString &commit)
+{
+    if (commit == m_commit)
+        emit diffChanged();
+}
+
+void GitCommitList::repoUrlChanged()
+{
+    m_diffDirty = true;
+    m_commits.clear();
+    m_commit.clear();
+    m_diff.clear();
+    emit branchesChanged();
+    emit diffChanged();
+    emit modelChanged();
+}
+
+QString GitCommitList::currentCommit() const
+{
+    return m_commit;
+}
+
+void GitCommitList::setCurrentCommit(const QString &commit)
+{
+    m_commit = commit;
+    if (!m_commit.isEmpty()) {
+        m_repo->cache()->loadDiff(commit);
+        emit updateCache();
+    }
+    emit diffChanged();
+}
+
+
+QString GitCommitList::diff() const
+{
+    if (!m_commit.isEmpty())
+        return m_repo->cache()->diff(m_commit);
+    return QString();
+}
+
+
+void GitCommitList::startDrag(const QString &oid)
+{
+    qDebug() << "DRAG: " << oid;
 }

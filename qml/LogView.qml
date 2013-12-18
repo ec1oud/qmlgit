@@ -52,6 +52,8 @@ Item {
     property string committerEmail
     property string message
 
+    property GitModel gitModel
+
     SystemPalette {
         id: pal
     }
@@ -65,7 +67,7 @@ Item {
             focus: true
             activeFocusOnTab: true
 
-            model: git.logModel
+            model: gitModel
             delegate: commitDelegate
 
             Keys.onDownPressed: incrementCurrentIndex()
@@ -95,7 +97,7 @@ Item {
                     logView.committer = committer
                     logView.committerEmail = committerEmail
                     logView.currentCommit = oid
-                    git.currentCommit = oid
+                    gitModel.currentCommit = oid
                 }
             }
 

@@ -42,11 +42,12 @@ import DiffHighlighter 1.0
 import Git 1.0
 
 Rectangle {
+    property alias text: textArea.text
+
     TextArea {
         id: textArea
         font.family: "mono"
         anchors.fill: parent
-        text: git.diff
         readOnly: true
         selectByKeyboard: true
     }

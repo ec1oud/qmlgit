@@ -46,7 +46,7 @@ ApplicationWindow {
 
     id: root
     Git {
-        id: git
+        id: gitRepo
         repoUrl: urlField.text
     }
 
@@ -83,6 +83,11 @@ ApplicationWindow {
         id: tabs
         anchors.fill: parent
 
+        Tab {
+            title: "Reorder"
+            source: "qrc:/qml/Reorder.qml"
+        }
+
 //        currentIndex: 1
         Tab {
             title: "Log"
@@ -103,7 +108,7 @@ ApplicationWindow {
             anchors.fill: parent
             anchors.margins: 4
             Label {
-                text: git.statusMessage
+                text: gitRepo.statusMessage
             }
             Item {
                 Layout.fillWidth: true

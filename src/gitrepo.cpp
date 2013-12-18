@@ -57,7 +57,7 @@
 using namespace LibQGit2;
 
 Git::Git()
-    : m_workerThread(0), m_diffDirty(true), m_gitCache(0), m_log(new GitCommitList())
+    : m_workerThread(0), m_gitCache(0)
 {
     m_workerThread = new QThread(this);
     qDebug() << "main thread: " << thread()->currentThreadId();
@@ -66,14 +66,11 @@ Git::Git()
 Git::~Git()
 {
     delete m_gitCache;
-    delete m_log;
 }
 
 void Git::setRepoUrl(const QString &url)
 {
     m_url = url;
-    m_commit.clear();
-    m_branch.clear();
 
     try {
         m_repository.discoverAndOpen(url);
@@ -88,24 +85,16 @@ void Git::setRepoUrl(const QString &url)
     }
     m_gitCache = 0;
 
-    m_log->setBranchData(QVector<Commit>());
-
     if (QDir::isAbsolutePath(url)) {
-        m_diffDirty = true;
         m_gitCache = new GitCache(m_repository);
         connect(this, &Git::updateCache, m_gitCache, &GitCache::doWork);
 
-        connect(m_gitCache, &GitCache::branchLoaded, this, &Git::branchLoaded);
-        connect(m_gitCache, &GitCache::diffLoaded, this, &Git::diffLoaded);
         m_gitCache->moveToThread(m_workerThread);
-
         connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
         connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
         m_workerThread->start();
     }
     emit repoUrlChanged();
-    emit diffChanged();
-    emit modelChanged();
     emit branchesChanged();
 }
 
@@ -128,67 +117,13 @@ QStringList Git::branches()
     return b;
 }
 
-QString Git::currentBranch() const
-{
-    return m_branch;
-}
-
-void Git::setCurrentBranch(const QString &branch)
-{
-    m_branch = branch;
-    if (!branch.isEmpty()) {
-        Q_ASSERT(m_gitCache);
-        m_gitCache->loadBranch(branch);
-        emit updateCache();
-    }
-}
-
-void Git::branchLoaded(const QString &branch)
-{
-    if (branch == m_branch) {
-        m_log->setBranchData(m_gitCache->branchData(branch));
-        emit modelChanged();
-    }
-}
-
-void Git::diffLoaded(const QString &commit)
-{
-    if (commit == m_commit)
-        emit diffChanged();
-}
-
-QString Git::currentCommit() const
-{
-    return m_commit;
-}
-
-void Git::setCurrentCommit(const QString &commit)
-{
-    m_commit = commit;
-    if (!m_commit.isEmpty()) {
-        m_gitCache->loadDiff(commit);
-        emit updateCache();
-    }
-    emit diffChanged();
-}
-
-QAbstractItemModel *Git::logModel()
-{
-    return m_log;
-}
-
-QString Git::diff() const
-{
-    if (!m_commit.isEmpty())
-        return m_gitCache->diff(m_commit);
-    return QString();
-}
 
 void Git::setStatusMessage(const QString &status)
 {
     m_statusMessage = status;
     emit statusMessageChanged();
 }
+
 
 QML_DECLARE_TYPE(Git)
 QML_DECLARE_TYPE(QAbstractItemModel)

@@ -44,7 +44,7 @@ ColumnLayout {
     anchors.fill: parent
 
     Label {
-        text: "Git repository: " + git.repoUrl
+        text: "Git repository: " + gitRepo.repoUrl
     }
 
     ListView {

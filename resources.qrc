@@ -9,5 +9,7 @@
         <file>qml/branches.qml</file>
         <file>qml/Box.qml</file>
         <file>qml/Branch.qml</file>
+        <file>qml/CommitRect.qml</file>
+        <file>qml/Reorder.qml</file>
     </qresource>
 </RCC>
