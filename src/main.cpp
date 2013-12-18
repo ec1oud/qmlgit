@@ -42,7 +42,7 @@
 #include <QtQuick/QQuickView>
 
 #include "gitrepo.h"
-#include "gitcommitlist.h"
+#include "gitmodel.h"
 
 #include "diffhighlighter.h"
 #include "beziercurve.h"
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
     qmlRegisterType<BezierCurve>("CustomGeometry", 1, 0, "BezierCurve");
     qmlRegisterType<Git>("Git", 1, 0, "Git");
-    qmlRegisterType<GitCommitList>("Git", 1, 0, "GitModel");
+    qmlRegisterType<GitModel>("Git", 1, 0, "GitModel");
 
     engine.rootContext()->setContextProperty(QStringLiteral("workingDir"), QDir::currentPath());
 

@@ -11,7 +11,7 @@ set(qmlgit_SRCS
     beziercurve.cpp
     diffhighlighter.cpp
     gitcache.cpp
-    gitcommitlist.cpp
+    gitmodel.cpp
     gitdiff.cpp
     gitrepo.cpp
     main.cpp

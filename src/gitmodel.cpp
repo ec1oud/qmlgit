@@ -36,7 +36,7 @@
 ****************************************************************************/
 
 
-#include "gitcommitlist.h"
+#include "gitmodel.h"
 
 #include <QDateTime>
 #include <QThread>
@@ -44,27 +44,27 @@
 
 using namespace LibQGit2;
 
-GitCommitList::GitCommitList()
+GitModel::GitModel()
     : m_diffDirty(true)
 {
 
 }
 
-void GitCommitList::setGit(Git *repo) {
+void GitModel::setGit(Git *repo) {
     m_repo = repo;
-    connect(m_repo, &Git::repoUrlChanged, this, &GitCommitList::repoUrlChanged);
-    connect(m_repo, &Git::branchesChanged, this, &GitCommitList::branchesChanged);
+    connect(m_repo, &Git::repoUrlChanged, this, &GitModel::repoUrlChanged);
+    connect(m_repo, &Git::branchesChanged, this, &GitModel::branchesChanged);
 
-    connect(m_repo->cache(), &GitCache::branchLoaded, this, &GitCommitList::branchLoaded);
-    connect(m_repo->cache(), &GitCache::diffLoaded, this, &GitCommitList::diffLoaded);
+    connect(m_repo->cache(), &GitCache::branchLoaded, this, &GitModel::branchLoaded);
+    connect(m_repo->cache(), &GitCache::diffLoaded, this, &GitModel::diffLoaded);
 
-    connect(this, &GitCommitList::updateCache, m_repo->cache(), &GitCache::doWork);
+    connect(this, &GitModel::updateCache, m_repo->cache(), &GitCache::doWork);
 
     repoUrlChanged();
     emit gitChanged();
 }
 
-QHash<int, QByteArray> GitCommitList::roleNames() const
+QHash<int, QByteArray> GitModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles.insert(Oid, "oid");
@@ -79,14 +79,14 @@ QHash<int, QByteArray> GitCommitList::roleNames() const
     return roles;
 }
 
-void GitCommitList::setBranchData(const QVector<Commit> &data)
+void GitModel::setBranchData(const QVector<Commit> &data)
 {
     beginResetModel();
     m_commits = data;
     endResetModel();
 }
 
-int GitCommitList::rowCount(const QModelIndex &parent) const
+int GitModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -94,7 +94,7 @@ int GitCommitList::rowCount(const QModelIndex &parent) const
     return m_commits.count();
 }
 
-QVariant GitCommitList::data(const QModelIndex &index, int role) const
+QVariant GitModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
@@ -124,12 +124,12 @@ QVariant GitCommitList::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QString GitCommitList::currentBranch() const
+QString GitModel::currentBranch() const
 {
     return m_branch;
 }
 
-void GitCommitList::setCurrentBranch(const QString &branch)
+void GitModel::setCurrentBranch(const QString &branch)
 {
     m_branch = branch;
     if (!branch.isEmpty()) {
@@ -139,7 +139,7 @@ void GitCommitList::setCurrentBranch(const QString &branch)
     }
 }
 
-void GitCommitList::branchLoaded(const QString &branch)
+void GitModel::branchLoaded(const QString &branch)
 {
     if (branch == m_branch) {
         setBranchData(m_repo->cache()->branchData(branch));
@@ -147,13 +147,13 @@ void GitCommitList::branchLoaded(const QString &branch)
     }
 }
 
-void GitCommitList::diffLoaded(const QString &commit)
+void GitModel::diffLoaded(const QString &commit)
 {
     if (commit == m_commit)
         emit diffChanged();
 }
 
-void GitCommitList::repoUrlChanged()
+void GitModel::repoUrlChanged()
 {
     m_diffDirty = true;
     m_commits.clear();
@@ -164,12 +164,12 @@ void GitCommitList::repoUrlChanged()
     emit modelChanged();
 }
 
-QString GitCommitList::currentCommit() const
+QString GitModel::currentCommit() const
 {
     return m_commit;
 }
 
-void GitCommitList::setCurrentCommit(const QString &commit)
+void GitModel::setCurrentCommit(const QString &commit)
 {
     m_commit = commit;
     if (!m_commit.isEmpty()) {
@@ -180,7 +180,7 @@ void GitCommitList::setCurrentCommit(const QString &commit)
 }
 
 
-QString GitCommitList::diff() const
+QString GitModel::diff() const
 {
     if (!m_commit.isEmpty())
         return m_repo->cache()->diff(m_commit);
@@ -188,7 +188,7 @@ QString GitCommitList::diff() const
 }
 
 
-void GitCommitList::startDrag(const QString &oid)
+void GitModel::startDrag(const QString &oid)
 {
     qDebug() << "DRAG: " << oid;
 }

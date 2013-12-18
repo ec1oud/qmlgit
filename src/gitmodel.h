@@ -46,7 +46,7 @@
 #include "gitrepo.h"
 #include "gitcache.h"
 
-class GitCommitList : public QAbstractListModel
+class GitModel : public QAbstractListModel
 {
     Q_OBJECT
 
@@ -69,7 +69,7 @@ public:
         Time
     };
 
-    GitCommitList();
+    GitModel();
 
     Git *git() const { return m_repo; }
     void setGit(Git *repo);
