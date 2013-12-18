@@ -38,9 +38,6 @@
 
 #include "gitrepo.h"
 
-
-#include "gitdiff.h"
-
 #include <git2.h>
 #include <stdio.h>
 #include <stdlib.h>
