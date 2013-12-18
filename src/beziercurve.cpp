@@ -178,8 +178,6 @@ QSGNode *BezierCurve::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     QSGGeometryNode *node = 0;
     QSGGeometry *geometry = 0;
 
-    printf("updating the paint node...\n");
-
     if (!oldNode) {
         node = new QSGGeometryNode;
 //! [4] //! [5]

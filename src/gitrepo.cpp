@@ -117,6 +117,9 @@ bool Git::isValidRepository() const
 QStringList Git::branches()
 {
     QStringList b;
+    if (!m_repository.constData())
+        return b;
+
     QVector<Reference> refs = m_repository.references();
     foreach(const Reference &ref, refs) {
         if (ref.isBranch())

@@ -93,10 +93,6 @@ ApplicationWindow {
             source: "qrc:/qml/status.qml"
         }
         Tab {
-            title: "Diff"
-            source: "qrc:/qml/DiffView.qml"
-        }
-        Tab {
             title: "Branches"
             source: "qrc:/qml/branches.qml"
         }

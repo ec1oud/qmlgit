@@ -83,7 +83,7 @@ Item {
 
         Item {
             width: parent.width
-            height: messageText.height + 8
+            height: messageText.height + 1
 
             property bool current: ListView.isCurrentItem
             onCurrentChanged: {
@@ -108,7 +108,6 @@ Item {
                     width: parent.width - 8
 //                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     elide: Text.ElideRight
-                    y: 4
                     text: shortMessage
                     color: current ? pal.highlightedText : pal.text
                 }

@@ -36,7 +36,8 @@
 ****************************************************************************/
 
 
-#include <QtGui/QGuiApplication>
+//#include <QtGui/QGuiApplication>
+#include <QtWidgets/QApplication>
 #include <QtQml>
 #include <QtQuick/QQuickView>
 
@@ -47,7 +48,7 @@
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     QQmlEngine engine;
 
     qmlRegisterType<QAbstractItemModel>();

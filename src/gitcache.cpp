@@ -131,49 +131,7 @@ void GitCache::processDiff()
          emit diffLoaded(commitString);
          return;
      }
-
      emit statusChanged(QStringLiteral("Loading diff..."));
-
-//     git_diff_options opts = GIT_DIFF_OPTIONS_INIT;
-//     git_diff_list *diff;
-//
-//     if (commitString.isEmpty()) {
-//         int ret = git_diff_index_to_workdir(&diff, m_repo, NULL, &opts);
-//         if (ret != 0) {
-//             m_diffs[commitString] = QString("Error: Diff failed (%1)").arg(ret);
-//             return;
-//         }
-//     } else {
-//         git_tree *tree1 = 0;
-//         git_tree *tree2 = 0;
-//
-//         git_commit *commit;
-//         git_commit *parent;
-//
-//         git_oid oid1;
-//         git_oid_fromstr(&oid1, commitString.toLatin1().constData());
-//         git_commit_lookup(&commit, m_repo, &oid1);
-//         // take the first parent
-//         git_commit_parent(&parent, commit, 0);
-//
-//         const git_oid* oid2 = git_commit_id(parent);
-//
-//         git_object *obj1;
-//         git_object *obj2;
-//
-//         git_object_lookup_prefix(&obj1, m_repo, &oid1, commitString.size(), GIT_OBJ_ANY);
-//         git_object_lookup_prefix(&obj2, m_repo, oid2, commitString.size(), GIT_OBJ_ANY);
-//
-//         git_commit_tree(&tree1, (git_commit *)obj1);
-//         git_commit_tree(&tree2, (git_commit *)obj2);
-//         git_object_free(obj1);
-//         git_object_free(obj2);
-//
-//         git_diff_tree_to_tree(&diff, m_repo, tree2, tree1, &opts);
-//         git_tree_free(tree1);
-//         git_tree_free(tree2);
-     //     }
-
 
      Diff diff;
      if (commitString.isEmpty()) {
@@ -182,12 +140,14 @@ void GitCache::processDiff()
          OId oid;
          oid.fromString(commitString);
          Commit commit = m_repo.lookupCommit(oid);
-         diff = m_repo.diffCommitToParent(commit);
+         if (commit.parentCount() == 0) // initial commit
+             diff = m_repo.diffTrees(Tree(), commit.tree());
+         else
+             diff = m_repo.diffTrees(commit.parent(0).tree(), commit.tree());
+         // FIXME handle more than one parent
      }
 
-
      QString strDiff = diff.toPlainText();
-//     strDiff = QStringLiteral("+-+- diff placeholder for: ") + commitString;
      if (strDiff.isEmpty())
          strDiff = QStringLiteral("No changes in repository.");
 

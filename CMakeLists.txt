@@ -3,6 +3,7 @@ project(qmlgit)
 
 find_package(Qt5Core)
 find_package(Qt5Quick)
+find_package(Qt5Widgets)
 
 find_package(LibQGit2)
 
