@@ -77,17 +77,15 @@ void Git::setRepoUrl(const QString &url)
     }
 
     if (m_gitCache) {
-        m_workerThread->quit();
+//        m_workerThread->quit();
         m_gitCache->deleteLater();
     }
     m_gitCache = 0;
 
     if (QDir::isAbsolutePath(url)) {
         m_gitCache = new GitCache(m_repository);
-        connect(this, &Git::updateCache, m_gitCache, &GitCache::doWork);
-
         m_gitCache->moveToThread(m_workerThread);
-        connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
+//        connect(m_gitCache, &GitCache::done, m_workerThread, &QThread::quit);
         connect(m_gitCache, &GitCache::statusChanged, this, &Git::setStatusMessage);
         m_workerThread->start();
     }

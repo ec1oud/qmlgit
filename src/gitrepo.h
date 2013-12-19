@@ -78,7 +78,6 @@ signals:
     void repoUrlChanged();
     void branchesChanged();
     void statusMessageChanged();
-    void updateCache();
 
 private:
     void setStatusMessage(const QString &status);

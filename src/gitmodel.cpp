@@ -52,15 +52,11 @@ GitModel::GitModel()
 
 }
 
-void GitModel::setGit(Git *repo) {
+void GitModel::setGit(Git *repo)
+{
     m_repo = repo;
     connect(m_repo, &Git::repoUrlChanged, this, &GitModel::repoUrlChanged);
     connect(m_repo, &Git::branchesChanged, this, &GitModel::branchesChanged);
-
-    connect(m_repo->cache(), &GitCache::branchLoaded, this, &GitModel::branchLoaded);
-    connect(m_repo->cache(), &GitCache::diffLoaded, this, &GitModel::diffLoaded);
-
-    connect(this, &GitModel::updateCache, m_repo->cache(), &GitCache::doWork);
 
     repoUrlChanged();
     emit gitChanged();
@@ -159,9 +155,13 @@ void GitModel::diffLoaded(const QString &commit)
 void GitModel::repoUrlChanged()
 {
     beginResetModel();
+    connect(m_repo->cache(), &GitCache::branchLoaded, this, &GitModel::branchLoaded);
+    connect(m_repo->cache(), &GitCache::diffLoaded, this, &GitModel::diffLoaded);
+    connect(this, &GitModel::updateCache, m_repo->cache(), &GitCache::doWork);
     m_diffDirty = true;
     m_commits.clear();
     m_commit.clear();
+    m_branch.clear();
     m_diff.clear();
     endResetModel();
     emit branchesChanged();
