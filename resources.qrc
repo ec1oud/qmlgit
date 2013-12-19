@@ -11,5 +11,6 @@
         <file>qml/Branch.qml</file>
         <file>qml/CommitRect.qml</file>
         <file>qml/Reorder.qml</file>
+        <file>qml/BranchView.qml</file>
     </qresource>
 </RCC>

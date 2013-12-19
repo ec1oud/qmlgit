@@ -35,38 +35,61 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.1
-import Git 1.0
+#include "gitdragmodel.h"
 
-Item {
-    anchors.fill: parent
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 4
-
-        RowLayout {
-            width: parent.width
-            height: 140
-            spacing: 4
-
-            Label {
-                text: "Branch:"
-            }
-            ComboBox {
-                id: comboBox
-                model: gitRepo.branches
-                implicitWidth: 200
-                onCurrentTextChanged: branchView.branch = currentText
-            }
-        }
-
-        BranchView {
-            width: parent.width
-            Layout.fillHeight: true
-            id: branchView
-        }
-    }
+bool FilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+//    if (m_sourceModel->index(source_row).data(GitModel::Oid) == m_dragCommit)
+//        return false;
+    return true;
 }
+
+void FilterModel::setSourceModel(GitModel *model)
+{
+    m_sourceModel = model;
+    QSortFilterProxyModel::setSourceModel(m_sourceModel);
+}
+
+void FilterModel::startDrag(int row, const QString &oid)
+{
+    dragStartRow = row;
+    dragRow = row;
+    targetRow = row;
+    lastTarget = row;
+}
+
+void FilterModel::dropTarget(int row, const QString &oid)
+{
+    qDebug() << "DRAG " << " current: " << targetRow << " ==> " << row << " last: " << lastTarget;
+    if (row == targetRow || row == lastTarget)
+        return;
+
+    beginMoveRows(QModelIndex(), targetRow, targetRow, QModelIndex(), row);
+    lastTarget = targetRow;
+    targetRow = row;
+    dragRow = row;
+    endMoveRows();
+}
+
+QVariant FilterModel::data(const QModelIndex &index, int role) const
+{
+    int row = index.row();
+    if (row >= targetRow && row < dragRow)
+        ++row;
+    else if (row <= targetRow && row > dragRow)
+        --row;
+
+//    qDebug() << "Data for row: " << index.row() << " returns: " << row;
+
+    return sourceModel()->data(sourceModel()->index(row), role);
+}
+
+void FilterModel::finishDragAndDrop()
+{
+    qDebug() << "Commit data: " << dragStartRow << " to: " << targetRow;
+
+    sourceModel()->moveCommit(dragStartRow, targetRow);
+    invalidate();
+}
+

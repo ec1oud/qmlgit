@@ -114,7 +114,6 @@ QStringList Git::branches()
     return b;
 }
 
-
 void Git::setStatusMessage(const QString &status)
 {
     m_statusMessage = status;

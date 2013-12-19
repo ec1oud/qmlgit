@@ -38,6 +38,8 @@
 
 #include "gitmodel.h"
 
+#include <qgit2.h>
+
 #include <QDateTime>
 #include <QThread>
 #include <QDebug>
@@ -142,8 +144,9 @@ void GitModel::setCurrentBranch(const QString &branch)
 void GitModel::branchLoaded(const QString &branch)
 {
     if (branch == m_branch) {
+        beginResetModel();
         setBranchData(m_repo->cache()->branchData(branch));
-        emit modelChanged();
+        endResetModel();
     }
 }
 
@@ -155,13 +158,14 @@ void GitModel::diffLoaded(const QString &commit)
 
 void GitModel::repoUrlChanged()
 {
+    beginResetModel();
     m_diffDirty = true;
     m_commits.clear();
     m_commit.clear();
     m_diff.clear();
+    endResetModel();
     emit branchesChanged();
     emit diffChanged();
-    emit modelChanged();
 }
 
 QString GitModel::currentCommit() const
@@ -179,7 +183,6 @@ void GitModel::setCurrentCommit(const QString &commit)
     emit diffChanged();
 }
 
-
 QString GitModel::diff() const
 {
     if (!m_commit.isEmpty())
@@ -187,8 +190,40 @@ QString GitModel::diff() const
     return QString();
 }
 
-
-void GitModel::startDrag(const QString &oid)
+void GitModel::moveCommit(int from, int to)
 {
-    qDebug() << "DRAG: " << oid;
+//    int oldCommit = from > to ? from : to;
+//    int newCommit = from < to ? from : to;
+
+//    OId oldOid;
+//    oldOid.fromString(data(index(oldCommit), Oid).toString());
+
+//    OId newOid;
+//    newOid.fromString(data(index(newCommit), Oid).toString());
+
+//    Repository repo = m_repo->repository();
+
+//    Commit oldCommit = repo.lookupCommit(oldOid);
+//    if (oldCommit.parentCount() != 1) {
+//        qWarning() << "Cannot play with merges or the initial commit";
+//        return;
+//    }
+
+//    Commit newCommit = repo.lookupCommit(newOid);
+
+//    qDebug() << "Old commit: " << repo.lookupCommit(oldOid).message();
+//    qDebug() << "New commit: " << repo.lookupCommit(newOid).message();
+
+//    // checkout parent of old commit
+
+
+
+//    // cherry-pick new commit
+//    Commit oldParent = oldCommit.parent(0);
+//    git_repository *grepo = repo.data();
+
+    // cherry-pick everything in the middle
+    // cherry-pick old commit
+    // cherry-pick everything after new commit
 }
+

@@ -35,38 +35,48 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.1
-import Git 1.0
 
-Item {
-    anchors.fill: parent
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 4
+#ifndef FILTERMODEL_H
+#define FILTERMODEL_H
 
-        RowLayout {
-            width: parent.width
-            height: 140
-            spacing: 4
+#include <qsortfilterproxymodel.h>
+#include "gitmodel.h"
 
-            Label {
-                text: "Branch:"
-            }
-            ComboBox {
-                id: comboBox
-                model: gitRepo.branches
-                implicitWidth: 200
-                onCurrentTextChanged: branchView.branch = currentText
-            }
-        }
+class FilterModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+    Q_PROPERTY(GitModel *sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged)
 
-        BranchView {
-            width: parent.width
-            Layout.fillHeight: true
-            id: branchView
-        }
-    }
-}
+public:
+    FilterModel()
+        : m_sourceModel(0), dragRow(-1), targetRow(-1), dragStartRow(-1), lastTarget(-1)
+    {}
+
+    Q_INVOKABLE void startDrag(int row, const QString &oid);
+    Q_INVOKABLE void dropTarget(int row, const QString &oid);
+    Q_INVOKABLE void finishDragAndDrop();
+
+    QVariant data(const QModelIndex &index, int role) const;
+
+public slots:
+    void setSourceModel(GitModel *model);
+    GitModel *sourceModel() const { return m_sourceModel; }
+
+signals:
+    void sourceModelChanged();
+
+protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+
+private:
+    GitModel *m_sourceModel;
+
+    QString m_dragCommit;
+    int dragStartRow;
+    int dragRow;
+    int targetRow;
+    int lastTarget;
+};
+
+#endif

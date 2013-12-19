@@ -84,23 +84,21 @@ ApplicationWindow {
         anchors.fill: parent
 
         Tab {
+            title: "Branches"
+            source: "qrc:/qml/Branch.qml"
+        }
+        Tab {
             title: "Reorder"
             source: "qrc:/qml/Reorder.qml"
         }
-
-//        currentIndex: 1
         Tab {
             title: "Log"
             source: "qrc:/qml/Log.qml"
         }
-        Tab {
-            title: "Status"
-            source: "qrc:/qml/status.qml"
-        }
-        Tab {
-            title: "Branches"
-            source: "qrc:/qml/branches.qml"
-        }
+//        Tab {
+//            title: "Status"
+//            source: "qrc:/qml/status.qml"
+//        }
     }
 
     statusBar: StatusBar {

@@ -14,7 +14,9 @@ Rectangle {
     property alias message: messageLabel.text
     property alias author: authorLabel.text
 
-    signal dragCommit(string oid)
+    signal dragCommit(int row, string oid)
+    signal dropTarget(int row, string oid)
+    signal dragAndDropFinished()
 
     Label {
         y: 2
@@ -38,11 +40,13 @@ Rectangle {
         onPressed: parent.focus = true
         drag.onActiveChanged: {
             if (drag.active)
-                root.dragCommit(root.oid)
+                root.dragCommit(index, root.oid)
+            else
+                root.dragAndDropFinished()
         }
     }
 
-    //Drag.active: mouseArea.drag.active
+    Drag.active: mouseArea.drag.active
     z: Drag.active ? 1 : 0
     Drag.hotSpot.x: 10
     Drag.hotSpot.y: 10
@@ -52,6 +56,7 @@ Rectangle {
         anchors.fill: parent
         onContainsDragChanged: {
             parent.opacity = containsDrag ? 0.7 : 1.0
+            root.dropTarget(index, root.oid)
         }
     }
 }

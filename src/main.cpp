@@ -43,6 +43,7 @@
 
 #include "gitrepo.h"
 #include "gitmodel.h"
+#include "gitdragmodel.h"
 
 #include "diffhighlighter.h"
 #include "beziercurve.h"
@@ -57,6 +58,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<BezierCurve>("CustomGeometry", 1, 0, "BezierCurve");
     qmlRegisterType<Git>("Git", 1, 0, "Git");
     qmlRegisterType<GitModel>("Git", 1, 0, "GitModel");
+    qmlRegisterType<FilterModel>("Git", 1, 0, "FilterModel");
 
     engine.rootContext()->setContextProperty(QStringLiteral("workingDir"), QDir::currentPath());
 

@@ -72,6 +72,8 @@ public:
 
     QString statusMessage() const { return m_statusMessage; }
 
+    LibQGit2::Repository repository() { return m_repository; }
+
 signals:
     void repoUrlChanged();
     void branchesChanged();

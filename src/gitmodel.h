@@ -90,7 +90,7 @@ public:
     QString currentCommit() const;
     void setCurrentCommit(const QString &commit);
 
-    Q_INVOKABLE void startDrag(const QString &oid);
+    void moveCommit(int from, int to);
 
 public slots:
     void branchLoaded(const QString &branch);
@@ -101,7 +101,6 @@ public slots:
 signals:
     void gitChanged();
     void diffChanged();
-    void modelChanged();
     void branchesChanged();
     void currentBranchChanged();
     void currentCommitChanged();
