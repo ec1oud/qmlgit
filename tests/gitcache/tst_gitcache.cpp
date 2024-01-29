@@ -49,6 +49,7 @@ private slots:
 
     void tags();
     void references();
+    void index();
 
 private:
     LibQGit2::Repository repo;
@@ -68,35 +69,30 @@ void tst_gitCache::cleanupTestCase()
 void tst_gitCache::tags()
 {
     QVERIFY(!repo.isBare());
-    qDebug() << repo.head().name();
+    qDebug() << "repo" << repo.head().name() << "@" << repo.path() << "has tags:";
     QStringList tags = repo.listTags();
     qDebug() << tags;
-
-
-//     git_strarray tag_names;
-//     QCOMPARE(git_tag_list(&tag_names, repo), 0);
-//     for (uint i = 0; i < tag_names.count; ++i)
-//         qDebug() << "Found TAG: " << tag_names.strings[i];
-//
-//     git_strarray_free(&tag_names);
 }
 
 void tst_gitCache::references()
 {
-//    GIT_REF_INVALID
-//    GIT_REF_OID        points to OID
-//    GIT_REF_SYMBOLIC   points to reference
-//    GIT_REF_PACKED
-//    GIT_REF_HAS_PEEL
-//    GIT_REF_LISTALL
-
-    auto refs = repo.listReferences();
-    foreach(auto &ref, refs) {
-        qDebug() << "REF: " << ref;
+    for(const auto &refname : repo.listReferences()) {
+        LibQGit2::Reference ref = repo.lookupRef(refname);
+        qDebug() << "REF: " << ref.name()
+                 << (ref.isSymbolic() ? ref.symbolicTarget() : "not symbolic")
+                 << (ref.isDirect() ? "direct" : "indirect");
     }
 }
 
-
+void tst_gitCache::index()
+{
+    LibQGit2::Index idx = repo.index();
+    qDebug() << idx.entryCount() << "entries in index:";
+    for (int i = 0; i < idx.entryCount(); ++i) {
+        LibQGit2::IndexEntry entry = idx.getByIndex(i);
+        qDebug() << i << entry.id().format() << entry.path() << "size" << entry.fileSize();
+    }
+}
 
 QTEST_MAIN(tst_gitCache)
 #include "tst_gitcache.moc"
