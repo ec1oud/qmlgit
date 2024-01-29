@@ -1,5 +1,5 @@
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick
+import QtQuick.Controls
 
 Rectangle {
     id: root

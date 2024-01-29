@@ -35,11 +35,11 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick
+import QtQuick.Controls
 
-import DiffHighlighter 1.0
-import Git 1.0
+import DiffHighlighter
+import Git
 
 Rectangle {
     property alias text: textArea.text

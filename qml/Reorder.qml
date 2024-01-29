@@ -1,8 +1,8 @@
-import QtQuick 2.1
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.1
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
-import Git 1.0
+import Git
 
 RowLayout {
     anchors.fill: parent
@@ -27,7 +27,6 @@ RowLayout {
         }
 
         ScrollView {
-            frameVisible: true
             Layout.fillHeight: true
 
             ListView {

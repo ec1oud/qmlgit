@@ -57,7 +57,7 @@ Git::Git()
     : m_workerThread(0), m_gitCache(0)
 {
     m_workerThread = new QThread(this);
-    qDebug() << "main thread: " << thread()->currentThreadId();
+    // qDebug() << "main thread: " << thread()->currentThreadId();
 }
 
 Git::~Git()

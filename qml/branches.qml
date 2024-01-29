@@ -35,9 +35,9 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import Git 1.0
-import CustomGeometry 1.0
+import QtQuick
+import Git
+import CustomGeometry
 
 Item {
     anchors.fill: parent

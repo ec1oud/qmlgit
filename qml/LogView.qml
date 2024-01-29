@@ -35,8 +35,8 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.1
+import QtQuick
+import QtQuick.Controls
 
 import Git 1.0
 
@@ -60,7 +60,6 @@ Item {
 
     ScrollView {
         anchors.fill: parent
-        frameVisible: true
         ListView {
             id: list
             anchors.fill: parent

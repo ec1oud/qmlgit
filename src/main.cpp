@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     QQmlEngine engine;
 
-    qmlRegisterType<QAbstractItemModel>();
+    // qmlRegisterType<QAbstractItemModel>();
     qmlRegisterType<DiffHighlighter>("DiffHighlighter", 1, 0, "DiffHighlighter");
     qmlRegisterType<BezierCurve>("CustomGeometry", 1, 0, "BezierCurve");
     qmlRegisterType<Git>("Git", 1, 0, "Git");
@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
         qWarning("%s", qPrintable(component.errorString()));
         return -1;
     }
+    LibQGit2::initLibQGit2();
     QObject *topLevel = component.create();
     QQuickWindow *window = qobject_cast<QQuickWindow *>(topLevel);
     if (!window) {

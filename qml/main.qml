@@ -35,10 +35,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import Git 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Git
 
 ApplicationWindow {
     width: 600
@@ -63,9 +63,10 @@ ApplicationWindow {
         onTriggered: tabs.current = 2
     }
 
-    toolBar: ToolBar {
-        width: parent.width
+    header: ToolBar {
+        height: tbLayout.implicitHeight + 8
         RowLayout {
+            id: tbLayout
             anchors.fill: parent
             anchors.margins: 4
             Label { text: "Repo:" }
@@ -79,29 +80,35 @@ ApplicationWindow {
         }
     }
 
-    TabView {
-        id: tabs
-        anchors.fill: parent
-
-        Tab {
-            title: "Branches"
-            source: "qrc:/qml/Branch.qml"
+    TabBar {
+        id: bar
+        width: parent.width
+        TabButton {
+            text: qsTr("Branches")
         }
-        Tab {
-            title: "Reorder"
-            source: "qrc:/qml/Reorder.qml"
+        TabButton {
+            text: qsTr("Reorder")
         }
-        Tab {
-            title: "Log"
-            source: "qrc:/qml/Log.qml"
+        TabButton {
+            text: qsTr("Log")
         }
-//        Tab {
-//            title: "Status"
-//            source: "qrc:/qml/status.qml"
-//        }
     }
 
-    statusBar: StatusBar {
+    Loader {
+        anchors.fill: parent
+        anchors.topMargin: bar.height
+        source:
+            switch (bar.currentIndex) {
+            case 0:
+                return "qrc:/qml/Branch.qml"
+            case 1:
+                return "qrc:/qml/Reorder.qml"
+            case 2:
+                return "qrc:/qml/Log.qml"
+            }
+    }
+
+    footer: ToolBar {
         RowLayout {
             anchors.fill: parent
             anchors.margins: 4

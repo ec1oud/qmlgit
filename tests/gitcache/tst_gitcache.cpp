@@ -56,7 +56,8 @@ private:
 
 void tst_gitCache::initTestCase()
 {
-    QString path = QStringLiteral("/home/frederik/dev/qt-src-dev/qtbase");
+    LibQGit2::initLibQGit2();
+    QString path = QStringLiteral(".");
     repo.discoverAndOpen(path);
 }
 
@@ -89,9 +90,9 @@ void tst_gitCache::references()
 //    GIT_REF_HAS_PEEL
 //    GIT_REF_LISTALL
 
-    QVector<LibQGit2::Reference> refs = repo.references();
-    foreach(const LibQGit2::Reference &ref, refs) {
-        qDebug() << "REF: " << ref.name() << ref.isSymbolic() << ref.isBranch();
+    auto refs = repo.listReferences();
+    foreach(auto &ref, refs) {
+        qDebug() << "REF: " << ref;
     }
 }
 
