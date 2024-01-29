@@ -135,7 +135,7 @@ void GitCache::processDiff()
 
      Diff diff;
      if (commitString.isEmpty()) {
-         diff = m_repo.diffIndexToWorkdir();
+         // diff = m_repo.diffIndexToWorkdir(); // TODO
      } else {
          OId oid;
          oid.fromString(commitString);
@@ -147,7 +147,7 @@ void GitCache::processDiff()
          // FIXME handle more than one parent
      }
 
-     QString strDiff = diff.toPlainText();
+     QString strDiff; // = diff.toPlainText(); // TODO
      if (strDiff.isEmpty())
          strDiff = QStringLiteral("No changes in repository.");
 
