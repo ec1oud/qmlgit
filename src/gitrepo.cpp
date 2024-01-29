@@ -104,11 +104,14 @@ QStringList Git::branches()
     if (!m_repository.constData())
         return b;
 
-    // QVector<Reference> refs = m_repository.references();
-    // foreach(const Reference &ref, refs) {
-    //     if (ref.isBranch())
-    //         b.append(ref.name());
-    // }
+    LibQGit2::Reference head = m_repository.head();
+    b.append(head.name());
+
+    for(const auto &refname : m_repository.listReferences()) {
+        LibQGit2::Reference ref = m_repository.lookupRef(refname);
+        if (ref.isDirect() && ref.name() != head.name())
+            b.append(ref.name());
+    }
     return b;
 }
 
